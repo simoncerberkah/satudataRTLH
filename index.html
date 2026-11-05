@@ -1,0 +1,2624 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SATU DATA RTLH — Dinas Perkim Kota Tegal</title>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Leaflet JS Interactive Map CSS & Script -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            page: '#F8FAFC',
+            surface: '#FFFFFF',
+            subtle: '#F1F5F9',
+            ink: {
+              900: '#0F172A',
+              700: '#334155',
+              500: '#64748B',
+              400: '#94A3B8',
+            },
+            brand: {
+              blue: '#1D63FF',
+              blueDark: '#154ED1',
+              blueSoft: '#EEF4FF',
+              dark: '#141B2D'
+            },
+            bsps: {
+              cream: '#F4EFE6',
+              gray: '#EBEEF2',
+              yellow: '#FDF3D7',
+              blue: '#DCEBFA',
+              green: '#DCFCE7',
+              greenText: '#15803D',
+              red: '#FEE2E2',
+              redText: '#B91C1C',
+              amberBadge: '#FEF3C7',
+              amberText: '#B45309'
+            }
+          },
+          boxShadow: {
+            'soft': '0 10px 30px -6px rgba(15, 23, 42, 0.06)',
+            'card': '0 2px 12px -2px rgba(15, 23, 42, 0.04)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .page-fade {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+    /* Custom Styling untuk Peta Leaflet Kota Tegal */
+    .leaflet-container {
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      z-index: 10;
+    }
+    .kec-label-tooltip {
+      background: rgba(15, 23, 42, 0.82) !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      color: #FFFFFF !important;
+      font-weight: 700 !important;
+      font-size: 11px !important;
+      letter-spacing: 0.03em !important;
+      padding: 4px 10px !important;
+      border-radius: 9999px !important;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18) !important;
+    }
+    .kec-label-tooltip::before {
+      display: none !important;
+    }
+    .leaflet-popup-content-wrapper {
+      border-radius: 20px !important;
+      padding: 4px !important;
+      box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.18) !important;
+    }
+    .leaflet-popup-content {
+      margin: 12px 14px !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-page text-ink-900 selection:bg-brand-blue selection:text-white">
+
+  <!-- ===================================================================== -->
+  <!-- STICKY TOP NAVBAR (TAMPIL SAAT SUDAH LOGIN)                           -->
+  <!-- ===================================================================== -->
+  <header id="appHeader" class="hidden sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <!-- Kiri: Logo & Nama Aplikasi (Satu Baris Rapi) -->
+      <button onclick="navigateTo('home')" class="flex items-center gap-3 text-left group focus:outline-none shrink-0">
+        <div class="w-10 h-10 rounded-2xl bg-brand-blue text-white flex items-center justify-center shadow-xs group-hover:bg-brand-blueDark transition-colors shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/>
+          </svg>
+        </div>
+        <div class="whitespace-nowrap">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-sm sm:text-base tracking-tight text-ink-900 whitespace-nowrap">SATU DATA RTLH</span>
+            <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-brand-blueSoft text-brand-blue whitespace-nowrap">Kota Tegal</span>
+          </div>
+          <p class="text-[11px] text-ink-500 hidden sm:block whitespace-nowrap">Dinas Perkim Kota Tegal</p>
+        </div>
+      </button>
+
+      <!-- Tengah: Menu Navigasi Kapsul (Segmented Pill - Satu Baris Tanpa Turun Baris) -->
+      <nav class="hidden lg:flex items-center gap-1 p-1 rounded-2xl bg-subtle border border-slate-200/70 shrink-0">
+        <button onclick="navigateTo('home')" data-top-nav="home" class="top-nav-btn whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all">
+          Beranda
+        </button>
+        <button onclick="navigateTo('verifikasi')" data-top-nav="verifikasi" class="top-nav-btn whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all">
+          Data & Prioritas
+        </button>
+        <button onclick="navigateTo('survey')" data-top-nav="survey" class="top-nav-btn whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all">
+          Input Survey
+        </button>
+        <button onclick="navigateTo('peta')" data-top-nav="peta" class="top-nav-btn whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all">
+          Peta Wilayah
+        </button>
+      </nav>
+
+      <!-- Kanan: Profil Petugas, Notifikasi & Tombol Keluar (Satu Baris Utuh) -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div class="hidden sm:flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl bg-page border border-slate-200/80">
+          <div class="w-7 h-7 rounded-xl bg-brand-blueSoft text-brand-blue font-bold text-xs flex items-center justify-center shrink-0">
+            TS
+          </div>
+          <div class="text-left leading-tight whitespace-nowrap">
+            <div id="headerUserName" class="text-xs font-bold text-ink-900 whitespace-nowrap">Tri Setyo Wibowo</div>
+            <div id="headerUserRole" class="text-[10px] text-ink-500 whitespace-nowrap">Surveyor Lapangan</div>
+          </div>
+        </div>
+
+        <button onclick="openNotificationModal()" title="Pemberitahuan" class="w-9 h-9 rounded-xl bg-subtle hover:bg-slate-200/70 flex items-center justify-center text-ink-700 relative transition-colors shrink-0">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="w-2 h-2 rounded-full bg-red-500 absolute top-2 right-2"></span>
+        </button>
+
+        <button onclick="handleLogout()" title="Keluar ke Halaman Login" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-subtle hover:bg-red-50 hover:text-red-700 text-ink-700 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          <span class="hidden sm:inline whitespace-nowrap">Keluar</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- KONTEN UTAMA APLIKASI (DENGAN PADDING BAWAH LEGA AGAR TIDAK TERTUTUP) -->
+  <!-- ===================================================================== -->
+  <main id="appMain" class="flex-1 w-full pb-32 md:pb-16">
+    <!-- Diisi secara dinamis oleh JavaScript -->
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- BOTTOM NAVIGATION BAR MOBILE (TAMPIL DI LAYAR HP SAAT LOGIN)          -->
+  <!-- ===================================================================== -->
+  <nav id="mobileBottomNav" class="hidden md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200/90 px-3 py-2 shadow-soft">
+    <div class="grid grid-cols-4 gap-1 max-w-md mx-auto">
+      <button onclick="navigateTo('home')" data-mob-nav="home" class="mob-nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-brand-blue">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/>
+        </svg>
+        <span class="text-[11px] font-semibold mt-1">Beranda</span>
+      </button>
+
+      <button onclick="navigateTo('verifikasi')" data-mob-nav="verifikasi" class="mob-nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-ink-500">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span class="text-[11px] font-semibold mt-1">Verifikasi</span>
+      </button>
+
+      <button onclick="navigateTo('survey')" data-mob-nav="survey" class="mob-nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-ink-500">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="4"/>
+          <line x1="12" y1="8" x2="12" y2="16"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        <span class="text-[11px] font-semibold mt-1">Survey</span>
+      </button>
+
+      <button onclick="navigateTo('peta')" data-mob-nav="peta" class="mob-nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-ink-500">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        <span class="text-[11px] font-semibold mt-1">Peta RTLH</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL PANDUAN PENGISIAN LAPORAN (BAHASA SEHARI-HARI)                  -->
+  <!-- ===================================================================== -->
+  <div id="guideModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 shadow-soft border border-slate-100 space-y-5 page-fade">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <span class="text-xs font-semibold text-brand-blue bg-brand-blueSoft px-3 py-1 rounded-full">Panduan Petugas</span>
+          <h3 class="text-lg font-bold text-ink-900 mt-2">Cara Penilaian Prioritas Bantuan Rumah</h3>
+        </div>
+        <button onclick="closeGuideModal()" class="w-9 h-9 rounded-full bg-subtle flex items-center justify-center text-ink-500 hover:text-ink-900">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-xs sm:text-sm text-ink-500 leading-relaxed">
+        Aplikasi <strong class="text-ink-900">SATU DATA RTLH Kota Tegal</strong> otomatis mengurutkan warga dari yang paling darurat menerima bantuan berdasarkan 3 hal berikut:
+      </p>
+
+      <div class="space-y-3 text-xs sm:text-sm">
+        <div class="p-4 rounded-2xl bg-page border border-slate-200/70 space-y-1">
+          <div class="flex items-center justify-between font-bold text-ink-900">
+            <span>1. Kondisi Fisik Bangunan</span>
+            <span class="text-brand-blue">Bobot 55%</span>
+          </div>
+          <p class="text-ink-500 text-xs leading-relaxed">
+            Mengecek kondisi Pondasi, Sloof, Kolom/Tiang, Atap, Dinding, Lantai, Kamar Mandi (MCK), sirkulasi udara, dan luas rumah dibanding jumlah penghuni.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-page border border-slate-200/70 space-y-1">
+          <div class="flex items-center justify-between font-bold text-ink-900">
+            <span>2. Ekonomi & Tanggungan Keluarga</span>
+            <span class="text-brand-blue">Bobot 35%</span>
+          </div>
+          <p class="text-ink-500 text-xs leading-relaxed">
+            Penghasilan di bawah rata-rata UMK Kota Tegal, terdaftar di DTKS, serta jumlah anggota keluarga atau kondisi rentan (lansia, disabilitas, kepala keluarga perempuan).
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-page border border-slate-200/70 space-y-1">
+          <div class="flex items-center justify-between font-bold text-ink-900">
+            <span>3. Kejelasan Surat Tanah & Swadaya</span>
+            <span class="text-brand-blue">Bobot 10% + Syarat Wajib</span>
+          </div>
+          <p class="text-ink-500 text-xs leading-relaxed">
+            Tanah harus milik sendiri dan <strong class="text-ink-900">tidak sedang sengketa</strong>, bukan di tanah negara/jalur hijau, belum pernah dapat bantuan serupa 5 tahun terakhir, dan siap ikut gotong royong.
+          </p>
+        </div>
+      </div>
+
+      <button onclick="closeGuideModal()" class="w-full py-3.5 rounded-full bg-brand-dark text-white text-xs font-bold hover:bg-slate-800 transition-colors">
+        Tutup Panduan
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL PEMBERITAHUAN (NOTIFIKASI)                                      -->
+  <!-- ===================================================================== -->
+  <div id="notifModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-soft border border-slate-100 space-y-5 page-fade">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h3 class="text-base font-bold text-ink-900">Pemberitahuan Terbaru</h3>
+          <span class="w-5 h-5 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center">3</span>
+        </div>
+        <button onclick="closeNotificationModal()" class="text-xs font-semibold text-brand-blue hover:underline">Tutup</button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-page">
+          <div class="w-8 h-8 rounded-full bg-brand-blueSoft text-brand-blue flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div>
+            <div class="font-bold text-ink-900">Urutan Prioritas Diperbarui Otomatis</div>
+            <p class="text-ink-500 mt-0.5 leading-relaxed">Sistem telah mengurutkan ulang daftar warga paling darurat di 4 Kecamatan Kota Tegal.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-page">
+          <div class="w-8 h-8 rounded-full bg-bsps-green text-bsps-greenText flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+          </div>
+          <div>
+            <div class="font-bold text-ink-900">Prioritas #1: Kel. Muarareja</div>
+            <p class="text-ink-500 mt-0.5 leading-relaxed">Rumah Ibu Siti Aminah masuk urutan pertama karena kerusakan atap, dinding, dan lantai tanah.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-page">
+          <div class="w-8 h-8 rounded-full bg-bsps-amberBadge text-bsps-amberText flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div>
+            <div class="font-bold text-ink-900">1 Rumah Ditunda (Masalah Surat Tanah)</div>
+            <p class="text-ink-500 mt-0.5 leading-relaxed">Data Bapak Hendra Kusuma di Kel. Panggung belum direkomendasikan karena masih sengketa waris.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST FEEDBACK -->
+  <div id="toastBox" class="fixed bottom-24 md:bottom-6 right-4 sm:right-6 z-50 hidden bg-brand-dark text-white px-5 py-3.5 rounded-2xl shadow-lg flex items-center gap-3 text-xs font-medium max-w-sm">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+    <span id="toastText">Perubahan berhasil disimpan</span>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SCRIPT UTAMA APLIKASI                                                 -->
+  <!-- ===================================================================== -->
+  <script>
+    // 1. DATA MASTER WILAYAH ASLI KOTA TEGAL (4 Kecamatan & 27 Kelurahan beserta Koordinat Asli)
+    const MASTER_WILAYAH = {
+      "Tegal Barat": ["Muarareja", "Tegalsari", "Kraton", "Pesurungan Kidul", "Debong Lor", "Kemandungan", "Pekauman"],
+      "Tegal Timur": ["Mintaragen", "Panggung", "Mangkukusuman", "Kejambon", "Slerok"],
+      "Tegal Selatan": ["Debong Kidul", "Bandung", "Randugunting", "Kalinyamat Wetan", "Tunon", "Keturen", "Debong Tengah", "Debong Kulon"],
+      "Margadana": ["Sumurpanggang", "Kaligangsa", "Krandon", "Cabawan", "Margadana", "Pesurungan Lor", "Kalinyamat Kulon"]
+    };
+
+    // Koordinat GPS Asli Tiap Kelurahan di Kota Tegal
+    const KOORDINAT_KELURAHAN = {
+      // Tegal Barat
+      "Muarareja": [-6.8525, 109.1115],
+      "Tegalsari": [-6.8548, 109.1265],
+      "Kraton": [-6.8618, 109.1225],
+      "Pesurungan Kidul": [-6.8675, 109.1165],
+      "Debong Lor": [-6.8722, 109.1268],
+      "Kemandungan": [-6.8692, 109.1242],
+      "Pekauman": [-6.8655, 109.1302],
+      // Tegal Timur
+      "Mintaragen": [-6.8552, 109.1395],
+      "Panggung": [-6.8615, 109.1455],
+      "Mangkukusuman": [-6.8672, 109.1375],
+      "Kejambon": [-6.8738, 109.1392],
+      "Slerok": [-6.8785, 109.1460],
+      // Tegal Selatan
+      "Debong Kidul": [-6.8895, 109.1285],
+      "Bandung": [-6.8975, 109.1255],
+      "Randugunting": [-6.8785, 109.1305],
+      "Kalinyamat Wetan": [-6.8945, 109.1145],
+      "Tunon": [-6.8935, 109.1225],
+      "Keturen": [-6.8898, 109.1195],
+      "Debong Tengah": [-6.8835, 109.1275],
+      "Debong Kulon": [-6.8855, 109.1205],
+      // Margadana
+      "Sumurpanggang": [-6.8795, 109.1065],
+      "Kaligangsa": [-6.8795, 109.0885],
+      "Krandon": [-6.8845, 109.0985],
+      "Cabawan": [-6.8875, 109.0915],
+      "Margadana": [-6.8745, 109.1015],
+      "Pesurungan Lor": [-6.8685, 109.1085],
+      "Kalinyamat Kulon": [-6.8885, 109.1085]
+    };
+
+    // Poligon Batas Wilayah 4 Kecamatan di Kota Tegal untuk Peta Interaktif Leaflet
+    const POLIGON_KECAMATAN = {
+      "Tegal Barat": {
+        warna: "#1D63FF",
+        center: [-6.8610, 109.1210],
+        zoom: 14,
+        coords: [
+          [-6.8465, 109.1045],
+          [-6.8465, 109.1335],
+          [-6.8745, 109.1335],
+          [-6.8745, 109.1125],
+          [-6.8625, 109.1045]
+        ]
+      },
+      "Tegal Timur": {
+        warna: "#0D9488",
+        center: [-6.8665, 109.1430],
+        zoom: 14,
+        coords: [
+          [-6.8465, 109.1335],
+          [-6.8455, 109.1535],
+          [-6.8865, 109.1535],
+          [-6.8865, 109.1335]
+        ]
+      },
+      "Tegal Selatan": {
+        warna: "#D97706",
+        center: [-6.8875, 109.1240],
+        zoom: 14,
+        coords: [
+          [-6.8745, 109.1125],
+          [-6.8745, 109.1335],
+          [-6.9025, 109.1335],
+          [-6.9025, 109.1125]
+        ]
+      },
+      "Margadana": {
+        warna: "#7C3AED",
+        center: [-6.8795, 109.0975],
+        zoom: 14,
+        coords: [
+          [-6.8540, 109.0815],
+          [-6.8625, 109.1045],
+          [-6.8745, 109.1125],
+          [-6.8985, 109.1125],
+          [-6.8985, 109.0815]
+        ]
+      }
+    };
+
+    // 2. DATA WARGA & PENILAIAN STRUKTUR (warga_rtlh + penilaian_rtlh) DENGAN KOORDINAT ASLI KOTA TEGAL
+    let databaseWarga = [
+      {
+        id: 1,
+        nik: "3376014205680002",
+        noKk: "3376011002110004",
+        nama: "Ibu Siti Aminah",
+        usia: 58,
+        pekerjaan: "Buruh Cuci & Pengupas Bawang",
+        kecamatan: "Tegal Barat",
+        kelurahan: "Muarareja",
+        alamat: "Jl. Brawijaya RT 04 / RW 02, Kel. Muarareja",
+        penghasilan: 900000,
+        tanggungan: 4,
+        dtks: true,
+        kondisiRentan: "Kepala Keluarga Perempuan & Lansia",
+        swadaya: true,
+        pondasi: 4,
+        sloof: 4,
+        kolom: 4,
+        atap: 5,
+        dinding: 5,
+        lantai: 5,
+        sanitasi: 4,
+        luasHunian: 4,
+        luasMeter: 28,
+        buktiTanah: "Sertifikat Hak Milik (SHM)",
+        bebasSengketa: true,
+        bukanKawasanTerlarang: true,
+        belumPernahBantuan: true,
+        surveyor: "Tri Setyo Wibowo",
+        catatanLapangan: "Atap bocor parah dan kayu lapuk, dinding papan bercampur anyaman bambu rusak, lantai masih tanah.",
+        fotoRumah: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=900&q=80",
+        lat: -6.8515,
+        lng: 109.1085
+      },
+      {
+        id: 2,
+        nik: "3376021408710001",
+        noKk: "3376020804120009",
+        nama: "Bapak Slamet Riyadi",
+        usia: 54,
+        pekerjaan: "Nelayan Kecil Harian",
+        kecamatan: "Tegal Timur",
+        kelurahan: "Mintaragen",
+        alamat: "Jl. Halmahera Gang 3 RT 06 / RW 08, Kel. Mintaragen",
+        penghasilan: 1150000,
+        tanggungan: 5,
+        dtks: true,
+        kondisiRentan: "Tanggungan 5 Anggota Keluarga",
+        swadaya: true,
+        pondasi: 4,
+        sloof: 4,
+        kolom: 4,
+        atap: 5,
+        dinding: 4,
+        lantai: 5,
+        sanitasi: 4,
+        luasHunian: 5,
+        luasMeter: 24,
+        buktiTanah: "Surat Keterangan Kelurahan / Girik",
+        bebasSengketa: true,
+        bukanKawasanTerlarang: true,
+        belumPernahBantuan: true,
+        surveyor: "Tri Setyo Wibowo",
+        catatanLapangan: "Rangka atap keropos terkena angin laut, lantai plester hancur dan lembab, belum punya kamar mandi (MCK) pribadi.",
+        fotoRumah: "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=900&q=80",
+        lat: -6.8542,
+        lng: 109.1418
+      },
+      {
+        id: 3,
+        nik: "3376032111640003",
+        noKk: "3376031901100002",
+        nama: "Bapak Karto Suwiryo",
+        usia: 63,
+        pekerjaan: "Tukang Becak",
+        kecamatan: "Tegal Selatan",
+        kelurahan: "Debong Kidul",
+        alamat: "Jl. Teuku Umar Gang Melati RT 02 / RW 03, Debong Kidul",
+        penghasilan: 1100000,
+        tanggungan: 3,
+        dtks: true,
+        kondisiRentan: "Lansia (63 Tahun)",
+        swadaya: true,
+        pondasi: 4,
+        sloof: 4,
+        kolom: 4,
+        atap: 4,
+        dinding: 5,
+        lantai: 4,
+        sanitasi: 3,
+        luasHunian: 3,
+        luasMeter: 36,
+        buktiTanah: "Sertifikat Hak Milik (SHM)",
+        bebasSengketa: true,
+        bukanKawasanTerlarang: true,
+        belumPernahBantuan: true,
+        surveyor: "Tri Setyo Wibowo",
+        catatanLapangan: "Dinding bata tanpa plester retak struktural, sloof bawah rapuh, sirkulasi udara dan cahaya matahari kurang.",
+        fotoRumah: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80",
+        lat: -6.8908,
+        lng: 109.1282
+      },
+      {
+        id: 4,
+        nik: "3376040903790005",
+        noKk: "3376041207150001",
+        nama: "Bapak Wahyudi Pratama",
+        usia: 47,
+        pekerjaan: "Pedagang Keliling",
+        kecamatan: "Margadana",
+        kelurahan: "Sumurpanggang",
+        alamat: "Jl. Ki Hajar Dewantara RT 05 / RW 01, Sumurpanggang",
+        penghasilan: 1450000,
+        tanggungan: 4,
+        dtks: true,
+        kondisiRentan: "3 Anak Usia Sekolah",
+        swadaya: true,
+        pondasi: 3,
+        sloof: 3,
+        kolom: 3,
+        atap: 4,
+        dinding: 3,
+        lantai: 4,
+        sanitasi: 3,
+        luasHunian: 4,
+        luasMeter: 32,
+        buktiTanah: "Sertifikat Hak Milik (SHM)",
+        bebasSengketa: true,
+        bukanKawasanTerlarang: true,
+        belumPernahBantuan: true,
+        surveyor: "Tri Setyo Wibowo",
+        catatanLapangan: "Atap ruang belakang bocor saat hujan, lantai semen pecah-pecah, ukuran rumah sempit untuk 5 anggota keluarga.",
+        fotoRumah: "https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?auto=format&fit=crop&w=900&q=80",
+        lat: -6.8798,
+        lng: 109.0985
+      },
+      {
+        id: 5,
+        nik: "3376021809820007",
+        noKk: "3376022210160003",
+        nama: "Bapak Hendra Kusuma",
+        usia: 44,
+        pekerjaan: "Buruh Harian Lepas",
+        kecamatan: "Tegal Timur",
+        kelurahan: "Panggung",
+        alamat: "Kel. Panggung RT 09 / RW 04, Kec. Tegal Timur",
+        penghasilan: 1850000,
+        tanggungan: 2,
+        dtks: false,
+        kondisiRentan: "Tidak Ada",
+        swadaya: true,
+        pondasi: 3,
+        sloof: 3,
+        kolom: 3,
+        atap: 3,
+        dinding: 3,
+        lantai: 3,
+        sanitasi: 2,
+        luasHunian: 2,
+        luasMeter: 45,
+        buktiTanah: "Masih Sengketa Waris Keluarga",
+        bebasSengketa: false,
+        bukanKawasanTerlarang: true,
+        belumPernahBantuan: true,
+        surveyor: "Tri Setyo Wibowo",
+        catatanLapangan: "Kondisi fisik rusak ringan-sedang, namun tanah masih dalam status sengketa waris sehingga tidak direkomendasikan.",
+        fotoRumah: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=900&q=80",
+        lat: -6.8712,
+        lng: 109.1468
+      },
+      {
+        id: 6,
+        nik: "3376012904690008",
+        noKk: "3376011506120005",
+        nama: "Ibu Tarkimah",
+        usia: 57,
+        pekerjaan: "Pengrajin Ikan Asin",
+        kecamatan: "Tegal Barat",
+        kelurahan: "Tegalsari",
+        alamat: "Jl. Blanak Gang 4 RT 03 / RW 05, Kel. Tegalsari",
+        penghasilan: 1050000,
+        tanggungan: 4,
+        dtks: true,
+        kondisiRentan: "Kepala Keluarga Perempuan",
+        swadaya: true,
+        pondasi: 4,
+        sloof: 4,
+        kolom: 4,
+        atap: 4,
+        dinding: 4,
+        lantai: 5,
+        sanitasi: 4,
+        luasHunian: 4,
+        luasMeter: 27,
+        buktiTanah: "Sertifikat Hak Milik (SHM)",
+        bebasSengketa: true,
+        bukanKawasanTerlarang: true,
+        belumPernahBantuan: true,
+        surveyor: "Tri Setyo Wibowo",
+        catatanLapangan: "Lantai rumah sering tergenang rob dan masih tanah bercampur pecahan semen, kayu kuda-kuda atap mulai lapuk.",
+        fotoRumah: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=900&q=80",
+        lat: -6.8635,
+        lng: 109.1245
+      }
+    ];
+
+    // Foto Komponen Struktur (Sesuai tampilan referensi ke-3 "Detail CPB": Pondasi, Sloof, Kolom, dll.)
+    const FOTO_KOMPONEN = {
+      pondasi: "https://images.unsplash.com/photo-1541888946425-d09bb18086f6?auto=format&fit=crop&w=900&q=80",
+      sloof: "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=900&q=80",
+      kolom: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80",
+      atap: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=900&q=80",
+      dinding: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80",
+      lantai: "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=900&q=80"
+    };
+
+    // 3. STATE APLIKASI
+    let isLoggedIn = false;
+    let authTab = 'login'; // 'login' | 'phone' | 'register'
+    let currentUser = {
+      nama: "Tri Setyo Wibowo",
+      peran: "Surveyor Lapangan"
+    };
+
+    let activePage = 'login'; // 'login' | 'home' | 'verifikasi' | 'detail' | 'survey' | 'peta'
+    let selectedWargaId = 1;
+    let activeDetailTab = 'struktur'; // 'informasi' | 'pendukung' | 'struktur' | 'sanitasi'
+
+    // Filter State pada halaman Verifikasi & Peta
+    let filterKecamatan = 'Semua';
+    let filterKelurahan = 'Semua';
+    let filterStatus = 'Semua';
+    let searchKeyword = '';
+
+    // State Peta Interaktif Leaflet Kota Tegal
+    let leafletMap = null;
+    let leafletTileLayer = null;
+    let leafletLabelLayer = null;
+    let mapMode = 'street'; // 'street' | 'esri' | 'satellite'
+    let activeMapKecamatan = 'Semua';
+    let surveyMiniMap = null;
+    let surveyMarker = null;
+
+    // 4. LOGIKA PERHITUNGAN PRIORITAS OTOMATIS (v_prioritas_rtlh)
+    function hitungSkorWarga(w) {
+      // 1. Komponen Fisik Bangunan (Bobot 55%)
+      const totalFisik = w.pondasi + w.sloof + w.kolom + w.atap + w.dinding + w.lantai + w.sanitasi + w.luasHunian;
+      const skorFisik = (totalFisik / 40) * 55;
+
+      // 2. Komponen Sosial Ekonomi (Bobot 35%)
+      let skorEkonomi = 0;
+      skorEkonomi += w.dtks ? 15 : 4;
+      if (w.penghasilan <= 1000000) skorEkonomi += 12;
+      else if (w.penghasilan <= 1500000) skorEkonomi += 9;
+      else if (w.penghasilan <= 2200000) skorEkonomi += 6;
+      else skorEkonomi += 2;
+      skorEkonomi += Math.min(w.tanggungan * 2, 8);
+
+      // 3. Komponen Kesiapan Swadaya (Bobot 10%)
+      const skorSwadaya = w.swadaya ? 10 : 3;
+
+      const totalSkor = Math.round((skorFisik + skorEkonomi + skorSwadaya) * 10) / 10;
+
+      // Syarat Wajib Legalitas Tanah & Riwayat Bantuan
+      const direkomendasikan = Boolean(w.bebasSengketa && w.bukanKawasanTerlarang && w.belumPernahBantuan);
+
+      return {
+        skorAkhir: totalSkor,
+        skorFisik: Math.round(skorFisik * 10) / 10,
+        skorEkonomi,
+        skorSwadaya,
+        direkomendasikan
+      };
+    }
+
+    function getDaftarPrioritas() {
+      return databaseWarga
+        .map(w => ({ ...w, ...hitungSkorWarga(w) }))
+        .sort((a, b) => {
+          if (a.direkomendasikan !== b.direkomendasikan) {
+            return a.direkomendasikan ? -1 : 1;
+          }
+          return b.skorAkhir - a.skorAkhir;
+        })
+        .map((item, index) => ({
+          ...item,
+          peringkat: item.direkomendasikan ? index + 1 : '-'
+        }));
+    }
+
+    // Deskripsi Kondisi Struktur sesuai screenshot referensi ke-3 ("Ada, sebagian rapuh, tidak kokoh" + Huruf B)
+    function getDeskripsiKondisi(nilai) {
+      const n = Number(nilai);
+      if (n >= 5) {
+        return {
+          huruf: "C",
+          teks: "Rusak berat, rapuh parah, membahayakan penghuni",
+          badgeClass: "bg-bsps-red text-bsps-redText border-red-200"
+        };
+      }
+      if (n === 4) {
+        return {
+          huruf: "B",
+          teks: "Ada, sebagian rapuh, tidak kokoh",
+          badgeClass: "bg-bsps-amberBadge text-bsps-amberText border-amber-200"
+        };
+      }
+      if (n === 3) {
+        return {
+          huruf: "B",
+          teks: "Ada, rusak ringan dan perlu perbaikan sebagian",
+          badgeClass: "bg-bsps-amberBadge text-bsps-amberText border-amber-200"
+        };
+      }
+      return {
+        huruf: "A",
+        teks: "Ada, kondisi baik, kuat dan layak",
+        badgeClass: "bg-bsps-green text-bsps-greenText border-emerald-200"
+      };
+    }
+
+    function formatRupiah(nominal) {
+      return "Rp " + Number(nominal).toLocaleString('id-ID');
+    }
+
+    function showToast(pesan) {
+      const box = document.getElementById('toastBox');
+      document.getElementById('toastText').textContent = pesan;
+      box.classList.remove('hidden');
+      clearTimeout(window._toastTimeout);
+      window._toastTimeout = setTimeout(() => {
+        box.classList.add('hidden');
+      }, 3200);
+    }
+
+    function openGuideModal() {
+      document.getElementById('guideModal').classList.remove('hidden');
+    }
+    function closeGuideModal() {
+      document.getElementById('guideModal').classList.add('hidden');
+    }
+    function openNotificationModal() {
+      document.getElementById('notifModal').classList.remove('hidden');
+    }
+    function closeNotificationModal() {
+      document.getElementById('notifModal').classList.add('hidden');
+    }
+
+    // 5. NAVIGASI & AUTENTIKASI
+    function handleLogin(namaPetugas, peranPetugas, targetPage = 'home') {
+      if (namaPetugas) currentUser.nama = namaPetugas;
+      if (peranPetugas) currentUser.peran = peranPetugas;
+      isLoggedIn = true;
+      document.getElementById('headerUserName').textContent = currentUser.nama;
+      document.getElementById('headerUserRole').textContent = currentUser.peran;
+      navigateTo(targetPage);
+      showToast(`Selamat datang, ${currentUser.nama}`);
+    }
+
+    function handleLogout() {
+      isLoggedIn = false;
+      activePage = 'login';
+      renderApp();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function navigateTo(page, wargaId = null) {
+      if (wargaId !== null) {
+        selectedWargaId = Number(wargaId);
+      }
+      activePage = page;
+      renderApp();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================================
+    // 6. RENDER HALAMAN-HALAMAN APLIKASI
+    // =========================================================================
+
+    // A. HALAMAN LOGIN (Mengacu desain bersih Hommie UI Kit: Biru #1D63FF & Putih)
+    function renderLoginPage() {
+      return `
+        <div class="min-h-screen flex items-center justify-center px-4 py-8 sm:py-12 bg-page page-fade">
+          <div class="max-w-4xl w-full bg-white rounded-[32px] shadow-soft border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+
+            <!-- Kolom Kiri: Branding Biru Bersih (Hommie Welcome Style) -->
+            <div class="lg:col-span-5 bg-brand-blue text-white p-8 sm:p-10 flex flex-col justify-between">
+              <div class="space-y-6">
+                <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/15 text-xs font-semibold">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/>
+                  </svg>
+                  <span>Pemerintah Kota Tegal</span>
+                </div>
+
+                <div class="space-y-2.5">
+                  <h1 class="text-2xl sm:text-3xl font-bold tracking-tight leading-tight">
+                    SATU DATA RTLH
+                  </h1>
+                  <p class="text-sm text-blue-100 leading-relaxed">
+                    Sistem Akurat Terpadu Database Rumah Tidak Layak Huni — Dinas Perumahan dan Kawasan Permukiman Kota Tegal.
+                  </p>
+                </div>
+              </div>
+
+              <div class="my-8 rounded-2xl overflow-hidden border border-white/20 shadow-md">
+                <img
+                  src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80"
+                  onerror="this.src='https://placehold.co/600x360/1D63FF/FFFFFF?text=Kota+Tegal'"
+                  alt="Perumahan Kota Tegal"
+                  class="w-full h-44 object-cover"
+                />
+                <div class="p-4 bg-slate-900/80 text-xs space-y-1">
+                  <div class="font-bold text-white">Data Terpadu 4 Kecamatan Kota Tegal</div>
+                  <p class="text-slate-300">Tegal Barat, Tegal Timur, Tegal Selatan, dan Margadana</p>
+                </div>
+              </div>
+
+              <p class="text-xs text-blue-100 leading-relaxed">
+                Penentuan prioritas bantuan secara adil berdasarkan kondisi fisik rumah, ekonomi warga, dan kejelasan surat tanah.
+              </p>
+            </div>
+
+            <!-- Kolom Kanan: Form Masuk Petugas -->
+            <div class="lg:col-span-7 p-7 sm:p-10 lg:p-12 flex flex-col justify-between bg-white">
+              <div class="space-y-6">
+                <div class="space-y-1.5">
+                  <h2 class="text-xl sm:text-2xl font-bold text-ink-900">
+                    Selamat Datang di <span class="text-brand-blue">SATU DATA RTLH</span>
+                  </h2>
+                  <p class="text-xs sm:text-sm text-ink-500">
+                    Silakan masuk menggunakan akun petugas untuk mendata atau memverifikasi rumah warga.
+                  </p>
+                </div>
+
+                <!-- Pilihan Cara Masuk -->
+                <div class="inline-flex p-1 rounded-2xl bg-subtle border border-slate-200/70 w-full sm:w-auto">
+                  <button onclick="authTab='login'; renderApp();" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-semibold transition-all ${authTab === 'login' ? 'bg-white text-ink-900 shadow-xs' : 'text-ink-500 hover:text-ink-900'}">
+                    Akun Petugas
+                  </button>
+                  <button onclick="authTab='phone'; renderApp();" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-semibold transition-all ${authTab === 'phone' ? 'bg-white text-ink-900 shadow-xs' : 'text-ink-500 hover:text-ink-900'}">
+                    Nomor HP
+                  </button>
+                  <button onclick="authTab='register'; renderApp();" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-semibold transition-all ${authTab === 'register' ? 'bg-white text-ink-900 shadow-xs' : 'text-ink-500 hover:text-ink-900'}">
+                    Daftar Petugas
+                  </button>
+                </div>
+
+                ${authTab === 'login' ? `
+                  <form onsubmit="event.preventDefault(); handleLogin(document.getElementById('loginNameInput').value, 'Surveyor Lapangan');" class="space-y-4">
+                    <div>
+                      <label class="block text-xs font-semibold text-ink-700 mb-2">Nama atau NIP Petugas</label>
+                      <input
+                        id="loginNameInput"
+                        type="text"
+                        value="Tri Setyo Wibowo"
+                        required
+                        placeholder="Masukkan nama lengkap petugas"
+                        class="w-full px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue focus:bg-white transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-semibold text-ink-700 mb-2">Wilayah Tugas Kecamatan</label>
+                      <select class="w-full px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue focus:bg-white transition-colors">
+                        <option>Seluruh Wilayah Kota Tegal (4 Kecamatan)</option>
+                        <option>Kecamatan Tegal Barat</option>
+                        <option>Kecamatan Tegal Timur</option>
+                        <option>Kecamatan Tegal Selatan</option>
+                        <option>Kecamatan Margadana</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-semibold text-ink-700 mb-2">Kata Sandi</label>
+                      <input
+                        type="password"
+                        value="••••••••••••"
+                        required
+                        class="w-full px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue focus:bg-white transition-colors"
+                      />
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs pt-1">
+                      <label class="inline-flex items-center gap-2 text-ink-500 cursor-pointer">
+                        <input type="checkbox" checked class="rounded border-slate-300 text-brand-blue focus:ring-brand-blue" />
+                        <span>Ingat akun saya di perangkat ini</span>
+                      </label>
+                    </div>
+
+                    <div class="pt-2">
+                      <button type="submit" class="w-full py-4 rounded-full bg-brand-dark hover:bg-slate-800 text-white text-sm font-bold shadow-xs transition-colors">
+                        Masuk ke Aplikasi
+                      </button>
+                    </div>
+                  </form>
+                ` : ''}
+
+                ${authTab === 'phone' ? `
+                  <form onsubmit="event.preventDefault(); handleLogin('Tri Setyo Wibowo', 'Surveyor Lapangan');" class="space-y-4">
+                    <div>
+                      <label class="block text-xs font-semibold text-ink-700 mb-2">Nomor HP Petugas</label>
+                      <p class="text-xs text-ink-500 mb-3">Masukkan nomor HP yang terdaftar di Dinas Perkim Kota Tegal.</p>
+                      <div class="flex items-center gap-3">
+                        <div class="px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-sm font-semibold text-ink-900 shrink-0">
+                          +62
+                        </div>
+                        <input
+                          type="tel"
+                          value="81287859876"
+                          required
+                          placeholder="812xxxxxxxx"
+                          class="w-full px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-sm font-mono text-ink-900 tabular-nums focus:outline-none focus:border-brand-blue focus:bg-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="pt-2">
+                      <button type="submit" class="w-full py-4 rounded-full bg-brand-dark hover:bg-slate-800 text-white text-sm font-bold shadow-xs transition-colors">
+                        Masuk dengan Nomor HP
+                      </button>
+                    </div>
+                  </form>
+                ` : ''}
+
+                ${authTab === 'register' ? `
+                  <form onsubmit="event.preventDefault(); handleLogin(document.getElementById('regName').value, 'Surveyor Kelurahan');" class="space-y-3.5">
+                    <div>
+                      <label class="block text-xs font-semibold text-ink-700 mb-1.5">Nama Lengkap Petugas</label>
+                      <input id="regName" type="text" value="Tri Setyo Wibowo" required class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue" />
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-xs font-semibold text-ink-700 mb-1.5">Nomor HP</label>
+                        <input type="tel" value="+62 87859876547" required class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue" />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-semibold text-ink-700 mb-1.5">Asal Kelurahan / Dinas</label>
+                        <input type="text" value="Kelurahan Mintaragen" required class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue" />
+                      </div>
+                    </div>
+                    <div class="pt-2">
+                      <button type="submit" class="w-full py-4 rounded-full bg-brand-dark hover:bg-slate-800 text-white text-sm font-bold transition-colors">
+                        Daftar & Masuk Sekarang
+                      </button>
+                    </div>
+                  </form>
+                ` : ''}
+              </div>
+
+              <!-- Tombol Akses Cepat Tanpa Ketik -->
+              <div class="pt-6 mt-6 border-t border-slate-100 space-y-3">
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-400">Akses Cepat (Langsung Masuk)</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button onclick="handleLogin('Tri Setyo Wibowo', 'Surveyor Lapangan', 'home')" class="px-4 py-3 rounded-2xl bg-subtle hover:bg-brand-blueSoft hover:text-brand-blue text-ink-900 text-xs font-semibold text-left flex items-center justify-between transition-colors">
+                    <span>Masuk: Tri Setyo Wibowo</span>
+                    <span>→</span>
+                  </button>
+                  <button onclick="handleLogin('Tri Setyo Wibowo', 'Surveyor Lapangan', 'peta')" class="px-4 py-3 rounded-2xl bg-subtle hover:bg-brand-blueSoft hover:text-brand-blue text-ink-900 text-xs font-semibold text-left flex items-center justify-between transition-colors">
+                    <span>Langsung Buka Peta Kota Tegal</span>
+                    <span>→</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    // B. HALAMAN BERANDA (Menggabungkan SIPORLAH Welcome + BSPS Verifikasi CPB)
+    function renderHomePage() {
+      const daftarPrioritas = getDaftarPrioritas();
+      const tigaTeratas = daftarPrioritas.slice(0, 3);
+
+      return `
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 space-y-8 page-fade">
+
+          <!-- Sapaan Petugas (BSPS Header Style: Halo Surveyor! Fransiska Melathi C.) -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-card">
+            <div class="space-y-1">
+              <p class="text-xs sm:text-sm font-medium text-ink-500">Halo Surveyor!</p>
+              <h1 class="text-xl sm:text-2xl font-bold text-ink-900">${currentUser.nama}</h1>
+              <p class="text-xs text-ink-500">Wilayah Kerja: 4 Kecamatan Kota Tegal (Barat, Timur, Selatan, Margadana)</p>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <button onclick="navigateTo('survey')" class="px-4 py-2.5 rounded-full bg-brand-blue hover:bg-brand-blueDark text-white text-xs font-semibold transition-colors">
+                + Input Survey Baru
+              </button>
+              <button onclick="navigateTo('verifikasi')" class="px-4 py-2.5 rounded-full bg-subtle hover:bg-slate-200/70 text-ink-900 text-xs font-semibold transition-colors">
+                Lihat Urutan Warga
+              </button>
+            </div>
+          </div>
+
+          <!-- Grid Utama: Kiri SIPORLAH Menu Card, Kanan BSPS Verifikasi CPB Card -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+
+            <!-- BAGIAN 1: KARTU UTAMA GAYA SIPORLAH (Survey RTLH, Peta RTLH, Verifikasi RTLH) -->
+            <div class="lg:col-span-6 bg-white rounded-[28px] p-6 sm:p-8 border border-slate-200/80 shadow-card space-y-6">
+              <div class="text-center space-y-2.5 max-w-md mx-auto">
+                <h2 class="text-2xl font-bold tracking-tight text-ink-900">SATU DATA RTLH</h2>
+                <p class="text-xs sm:text-sm font-semibold text-ink-700 leading-snug">
+                  Dinas Perumahan dan Kawasan Permukiman<br/>Kota Tegal
+                </p>
+                <p class="text-xs text-ink-500">
+                  Sistem Informasi Pelaporan & Penentuan Prioritas Rumah Tidak Layak Huni
+                </p>
+                <div class="pt-2">
+                  <button onclick="navigateTo('peta')" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-dark hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-colors">
+                    <span>Explore the maps / Buka Peta</span>
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 2 Kartu Bersebelahan: Survey RTLH & Peta RTLH -->
+              <div class="grid grid-cols-2 gap-4">
+                <button onclick="navigateTo('survey')" class="p-5 rounded-2xl bg-white hover:bg-page border border-slate-200/90 flex flex-col items-center text-center gap-3 transition-all hover:border-brand-blue group">
+                  <div class="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 group-hover:scale-105 transition-transform">
+                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <rect x="5" y="3" width="14" height="18" rx="2"/>
+                      <line x1="9" y1="8" x2="15" y2="8"/>
+                      <line x1="9" y1="12" x2="15" y2="12"/>
+                      <line x1="9" y1="16" x2="12" y2="16"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-bold text-sm text-ink-900">Survey RTLH</div>
+                    <p class="text-[11px] text-ink-500 mt-0.5">Input cek fisik rumah</p>
+                  </div>
+                </button>
+
+                <button onclick="navigateTo('peta')" class="p-5 rounded-2xl bg-white hover:bg-page border border-slate-200/90 flex flex-col items-center text-center gap-3 transition-all hover:border-brand-blue group">
+                  <div class="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-brand-blue group-hover:scale-105 transition-transform">
+                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-bold text-sm text-ink-900">Peta RTLH</div>
+                    <p class="text-[11px] text-ink-500 mt-0.5">Sebaran 4 kecamatan</p>
+                  </div>
+                </button>
+              </div>
+
+              <!-- 1 Kartu Lebar: Verifikasi RTLH -->
+              <button onclick="navigateTo('verifikasi')" class="w-full p-6 rounded-2xl bg-white hover:bg-page border border-slate-200/90 flex flex-col items-center text-center gap-3 transition-all hover:border-brand-blue group">
+                <div class="w-16 h-16 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-brand-blue group-hover:scale-105 transition-transform">
+                  <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="4" width="14" height="14" rx="2"/>
+                    <line x1="7" y1="8" x2="13" y2="8"/>
+                    <line x1="7" y1="12" x2="11" y2="12"/>
+                    <circle cx="16.5" cy="16.5" r="3.5"/>
+                    <line x1="19" y1="19" x2="21.5" y2="21.5"/>
+                  </svg>
+                </div>
+                <div class="space-y-1">
+                  <div class="font-bold text-base text-ink-900">Verifikasi RTLH</div>
+                  <p class="text-xs text-ink-500 max-w-xs mx-auto leading-relaxed">
+                    Untuk mewujudkan bantuan yang tepat sasaran sesuai urutan prioritas warga
+                  </p>
+                </div>
+              </button>
+            </div>
+
+            <!-- BAGIAN 2: KARTU REKAP VERIFIKASI CPB GAYA BSPS (referensi ke-2) -->
+            <div class="lg:col-span-6 space-y-4">
+              <div class="bg-white rounded-[28px] p-6 sm:p-8 border border-slate-200/80 shadow-card space-y-4">
+                <div class="text-center pb-1">
+                  <span class="text-xs font-semibold text-ink-500">Verifikasi CPB (Calon Penerima Bantuan)</span>
+                </div>
+
+                <!-- Calon Penerima Bantuan (Cream) -->
+                <div class="p-5 rounded-2xl bg-bsps-cream space-y-1">
+                  <div class="text-xs font-medium text-ink-700">Calon Penerima Bantuan</div>
+                  <div class="text-2xl sm:text-3xl font-bold text-ink-900 tabular-nums">
+                    1.323 <span class="text-sm font-normal text-ink-500">orang</span>
+                  </div>
+                </div>
+
+                <!-- 2 Kolom: Proses Verifikasi & Proses Input Data -->
+                <div class="grid grid-cols-2 gap-3.5">
+                  <div class="p-4 sm:p-5 rounded-2xl bg-bsps-gray space-y-1">
+                    <div class="text-xs font-medium text-ink-700">Proses Verifikasi</div>
+                    <div class="text-xl sm:text-2xl font-bold text-ink-900 tabular-nums">
+                      298 <span class="text-xs font-normal text-ink-500">(22.5%)</span>
+                    </div>
+                  </div>
+                  <div class="p-4 sm:p-5 rounded-2xl bg-bsps-yellow space-y-1">
+                    <div class="text-xs font-medium text-ink-700">Proses Input Data</div>
+                    <div class="text-xl sm:text-2xl font-bold text-ink-900 tabular-nums">
+                      298 <span class="text-xs font-normal text-ink-500">(22.5%)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Selesai Verifikasi (Soft Blue) -->
+                <div class="p-5 rounded-2xl bg-bsps-blue space-y-1">
+                  <div class="text-xs font-medium text-ink-700">Selesai Verifikasi</div>
+                  <div class="text-xl sm:text-2xl font-bold text-ink-900 tabular-nums">
+                    25 <span class="text-xs font-normal text-ink-500">(1.8%)</span>
+                  </div>
+                </div>
+
+                <!-- 2 Kolom: Direkomendasikan & Tdk Direkomen. -->
+                <div class="grid grid-cols-2 gap-3.5">
+                  <button onclick="filterStatus='Direkomendasikan'; navigateTo('verifikasi');" class="p-4 sm:p-5 rounded-2xl bg-bsps-green text-left space-y-1 hover:brightness-95 transition-all">
+                    <div class="text-xs font-medium text-ink-700">Direkomendasikan</div>
+                    <div class="text-xl sm:text-2xl font-bold text-ink-900 tabular-nums">
+                      21 <span class="text-xs font-normal text-ink-500">(84%)</span>
+                    </div>
+                  </button>
+                  <button onclick="filterStatus='Tidak Direkomendasikan'; navigateTo('verifikasi');" class="p-4 sm:p-5 rounded-2xl bg-bsps-red text-left space-y-1 hover:brightness-95 transition-all">
+                    <div class="text-xs font-medium text-ink-700">Tdk Direkomen.</div>
+                    <div class="text-xl sm:text-2xl font-bold text-ink-900 tabular-nums">
+                      4 <span class="text-xs font-normal text-ink-500">(16%)</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Kartu Panduan Pengisian Laporan (Sesuai bagian bawah gambar BSPS) -->
+              <button onclick="openGuideModal()" class="w-full bg-white hover:bg-page rounded-2xl p-5 border border-slate-200/80 shadow-card flex items-center gap-4 text-left transition-colors">
+                <div class="w-12 h-12 rounded-2xl bg-bsps-cream text-teal-800 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm font-bold text-ink-900">Panduan Pengisian Laporan</div>
+                  <p class="text-xs text-ink-500 mt-0.5">Petunjuk singkat bagi surveyor untuk mengisi laporan di lapangan.</p>
+                </div>
+                <span class="text-ink-400 text-sm">→</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- RINGKASAN URUTAN PRIORITAS TERATAS KOTA TEGAL -->
+          <div class="bg-white rounded-[28px] p-6 sm:p-8 border border-slate-200/80 shadow-card space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-ink-900">Urutan Prioritas Bantuan Saat Ini (Kota Tegal)</h3>
+                <p class="text-xs text-ink-500">Diurutkan otomatis dari warga yang kondisi rumahnya paling mendesak.</p>
+              </div>
+              <button onclick="navigateTo('verifikasi')" class="text-xs font-bold text-brand-blue hover:underline self-start sm:self-auto">
+                Lihat Semua Daftar (${daftarPrioritas.length} Warga) →
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              ${tigaTeratas.map(w => `
+                <div onclick="navigateTo('detail', ${w.id})" class="cursor-pointer rounded-2xl border border-slate-200/80 overflow-hidden hover:border-brand-blue transition-all bg-page flex flex-col justify-between">
+                  <div>
+                    <div class="relative h-36 bg-slate-200">
+                      <img src="${w.fotoRumah}" onerror="this.src='https://placehold.co/600x400/E2E8F0/475569?text=Rumah+Warga'" alt="${w.nama}" class="w-full h-full object-cover" />
+                      <div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-brand-dark/90 text-white text-[11px] font-bold">
+                        Prioritas #${w.peringkat}
+                      </div>
+                      <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold ${w.direkomendasikan ? 'bg-bsps-green text-bsps-greenText' : 'bg-bsps-red text-bsps-redText'}">
+                        ${w.direkomendasikan ? 'Direkomendasikan' : 'Tdk Direkomen.'}
+                      </div>
+                    </div>
+                    <div class="p-4 space-y-2">
+                      <div class="font-bold text-sm text-ink-900">${w.nama}</div>
+                      <div class="text-xs text-ink-500">Kel. ${w.kelurahan}, Kec. ${w.kecamatan}</div>
+                      <p class="text-xs text-ink-700 line-clamp-2 leading-relaxed">${w.catatanLapangan}</p>
+                    </div>
+                  </div>
+                  <div class="px-4 py-3 bg-white border-t border-slate-200/60 flex items-center justify-between text-xs">
+                    <span class="text-ink-500">Skor Prioritas: <strong class="text-ink-900 tabular-nums">${w.skorAkhir}</strong>/100</span>
+                    <span class="font-semibold text-brand-blue">Cek Detail →</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // C. HALAMAN VERIFIKASI & DAFTAR URUTAN PRIORITAS WARGA
+    function renderVerifikasiPage() {
+      const semuaWarga = getDaftarPrioritas();
+
+      // Filter berdasarkan Kecamatan, Kelurahan, Status, dan Kata Kunci
+      const daftarTampil = semuaWarga.filter(w => {
+        const cocokKec = filterKecamatan === 'Semua' || w.kecamatan === filterKecamatan;
+        const cocokKel = filterKelurahan === 'Semua' || w.kelurahan === filterKelurahan;
+        const cocokStatus =
+          filterStatus === 'Semua' ||
+          (filterStatus === 'Direkomendasikan' && w.direkomendasikan) ||
+          (filterStatus === 'Tidak Direkomendasikan' && !w.direkomendasikan);
+        const kw = searchKeyword.trim().toLowerCase();
+        const cocokCari = !kw ||
+          w.nama.toLowerCase().includes(kw) ||
+          w.nik.includes(kw) ||
+          w.kelurahan.toLowerCase().includes(kw) ||
+          w.kecamatan.toLowerCase().includes(kw);
+
+        return cocokKec && cocokKel && cocokStatus && cocokCari;
+      });
+
+      const opsiKelurahan = filterKecamatan === 'Semua'
+        ? []
+        : (MASTER_WILAYAH[filterKecamatan] || []);
+
+      return `
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 space-y-6 page-fade">
+
+          <!-- Header Halaman -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <button onclick="navigateTo('home')" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-ink-700 hover:bg-subtle">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+                </svg>
+              </button>
+              <div>
+                <h1 class="text-lg sm:text-xl font-bold text-ink-900">Verifikasi & Urutan Prioritas Warga</h1>
+                <p class="text-xs text-ink-500">Klik salah satu warga untuk membuka Detail CPB dan melihat foto kondisi bangunan.</p>
+              </div>
+            </div>
+            <button onclick="navigateTo('survey')" class="px-4 py-2.5 rounded-full bg-brand-blue text-white text-xs font-semibold hover:bg-brand-blueDark self-start sm:self-auto">
+              + Tambah Survey Warga
+            </button>
+          </div>
+
+          <!-- Kotak Pencarian & Filter Wilayah Kota Tegal -->
+          <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-card space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+              <!-- Input Cari -->
+              <div class="md:col-span-5 relative">
+                <input
+                  type="text"
+                  value="${searchKeyword}"
+                  oninput="searchKeyword = this.value; renderApp();"
+                  placeholder="Cari nama warga, NIK, atau kelurahan..."
+                  class="w-full pl-10 pr-4 py-3 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-900 focus:outline-none focus:border-brand-blue"
+                />
+                <svg class="w-4 h-4 text-ink-400 absolute left-3.5 top-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </div>
+
+              <!-- Filter Kecamatan -->
+              <div class="md:col-span-3">
+                <select
+                  onchange="filterKecamatan = this.value; filterKelurahan = 'Semua'; renderApp();"
+                  class="w-full px-3.5 py-3 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-900 focus:outline-none focus:border-brand-blue"
+                >
+                  <option value="Semua" ${filterKecamatan === 'Semua' ? 'selected' : ''}>Semua Kecamatan (4)</option>
+                  ${Object.keys(MASTER_WILAYAH).map(kec => `
+                    <option value="${kec}" ${filterKecamatan === kec ? 'selected' : ''}>Kec. ${kec}</option>
+                  `).join('')}
+                </select>
+              </div>
+
+              <!-- Filter Kelurahan -->
+              <div class="md:col-span-2">
+                <select
+                  onchange="filterKelurahan = this.value; renderApp();"
+                  ${filterKecamatan === 'Semua' ? 'disabled' : ''}
+                  class="w-full px-3.5 py-3 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-900 disabled:opacity-50 focus:outline-none focus:border-brand-blue"
+                >
+                  <option value="Semua">Semua Kelurahan</option>
+                  ${opsiKelurahan.map(kel => `
+                    <option value="${kel}" ${filterKelurahan === kel ? 'selected' : ''}>Kel. ${kel}</option>
+                  `).join('')}
+                </select>
+              </div>
+
+              <!-- Filter Status Rekomendasi -->
+              <div class="md:col-span-2">
+                <select
+                  onchange="filterStatus = this.value; renderApp();"
+                  class="w-full px-3.5 py-3 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-900 focus:outline-none focus:border-brand-blue"
+                >
+                  <option value="Semua" ${filterStatus === 'Semua' ? 'selected' : ''}>Semua Status</option>
+                  <option value="Direkomendasikan" ${filterStatus === 'Direkomendasikan' ? 'selected' : ''}>Direkomendasikan</option>
+                  <option value="Tidak Direkomendasikan" ${filterStatus === 'Tidak Direkomendasikan' ? 'selected' : ''}>Tdk Direkomen.</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daftar Kartu Warga (Terurut Otomatis) -->
+          <div class="space-y-4">
+            ${daftarTampil.length === 0 ? `
+              <div class="bg-white rounded-3xl p-12 text-center border border-slate-200/80 space-y-3">
+                <div class="w-12 h-12 rounded-full bg-subtle text-ink-400 flex items-center justify-center mx-auto">
+                  <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+                <div class="font-bold text-sm text-ink-900">Data warga tidak ditemukan</div>
+                <p class="text-xs text-ink-500">Coba ubah pilihan kecamatan atau kata kunci pencarian Anda.</p>
+                <button onclick="filterKecamatan='Semua'; filterKelurahan='Semua'; filterStatus='Semua'; searchKeyword=''; renderApp();" class="px-4 py-2 rounded-full bg-subtle text-xs font-semibold text-ink-900">
+                  Reset Filter
+                </button>
+              </div>
+            ` : daftarTampil.map(w => `
+              <div onclick="navigateTo('detail', ${w.id})" class="cursor-pointer bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-card hover:border-brand-blue transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+                <div class="flex items-start gap-4 w-full sm:w-auto">
+                  <img
+                    src="${w.fotoRumah}"
+                    onerror="this.src='https://placehold.co/300x300/E2E8F0/475569?text=RTLH'"
+                    alt="${w.nama}"
+                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover shrink-0 bg-slate-100"
+                  />
+                  <div class="space-y-1.5 flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="px-2.5 py-0.5 rounded-full bg-brand-dark text-white text-[11px] font-bold">
+                        ${w.direkomendasikan ? `Prioritas #${w.peringkat}` : 'Ditunda / Gugur'}
+                      </span>
+                      <span class="px-3 py-0.5 rounded-full text-[11px] font-semibold ${w.direkomendasikan ? 'bg-bsps-green text-bsps-greenText' : 'bg-bsps-red text-bsps-redText'}">
+                        ${w.direkomendasikan ? 'Direkomendasikan' : 'Tidak Direkomendasikan'}
+                      </span>
+                    </div>
+
+                    <h3 class="text-base font-bold text-ink-900">${w.nama}</h3>
+                    <div class="text-xs font-mono text-ink-500 tabular-nums">NIK: ${w.nik} • Kel. ${w.kelurahan}, Kec. ${w.kecamatan}</div>
+
+                    <!-- Ringkasan Kondisi Singkat -->
+                    <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                      <span class="px-2.5 py-1 rounded-lg bg-page border border-slate-200/80 text-[11px] text-ink-700">
+                        Atap: Skala ${w.atap}/5
+                      </span>
+                      <span class="px-2.5 py-1 rounded-lg bg-page border border-slate-200/80 text-[11px] text-ink-700">
+                        Dinding: Skala ${w.dinding}/5
+                      </span>
+                      <span class="px-2.5 py-1 rounded-lg bg-page border border-slate-200/80 text-[11px] text-ink-700">
+                        Lantai: Skala ${w.lantai}/5
+                      </span>
+                      <span class="px-2.5 py-1 rounded-lg bg-page border border-slate-200/80 text-[11px] text-ink-700">
+                        ${w.dtks ? 'Terdaftar DTKS' : 'Non-DTKS'}
+                      </span>
+                      ${!w.bebasSengketa ? `
+                        <span class="px-2.5 py-1 rounded-lg bg-bsps-red text-bsps-redText text-[11px] font-semibold">
+                          Tanah Masih Sengketa
+                        </span>
+                      ` : ''}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Skor & Tombol Buka Detail CPB -->
+                <div class="w-full sm:w-auto flex sm:flex-col items-center sm:items-end justify-between gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 shrink-0">
+                  <div class="text-left sm:text-right">
+                    <div class="text-[11px] text-ink-400">Total Skor SPK</div>
+                    <div class="text-xl font-bold text-ink-900 tabular-nums">${w.skorAkhir} <span class="text-xs font-normal text-ink-400">/ 100</span></div>
+                  </div>
+                  <span class="px-4 py-2 rounded-full bg-subtle text-ink-900 text-xs font-semibold hover:bg-brand-blue hover:text-white transition-colors">
+                    Detail CPB →
+                  </span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+        </div>
+      `;
+    }
+
+    // D. HALAMAN DETAIL CPB (Mengikuti Referensi Gambar ke-3 "Detail CPB" 1:1)
+    function renderDetailCpbPage() {
+      const daftarPrioritas = getDaftarPrioritas();
+      const warga = daftarPrioritas.find(w => w.id === Number(selectedWargaId)) || daftarPrioritas[0];
+
+      const infoPondasi = getDeskripsiKondisi(warga.pondasi);
+      const infoSloof = getDeskripsiKondisi(warga.sloof);
+      const infoKolom = getDeskripsiKondisi(warga.kolom);
+      const infoAtap = getDeskripsiKondisi(warga.atap);
+      const infoDinding = getDeskripsiKondisi(warga.dinding);
+      const infoLantai = getDeskripsiKondisi(warga.lantai);
+
+      return `
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 space-y-6 page-fade">
+
+          <!-- Kartu Utama Detail CPB (Sesuai Tampilan Referensi ke-3) -->
+          <div class="bg-white rounded-[28px] border border-slate-200/80 shadow-card overflow-hidden">
+
+            <!-- Header Detail CPB: Tombol Back, Judul, NIK, dan Badge Direkomendasikan -->
+            <div class="p-6 sm:p-8 pb-4 flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3.5">
+                <button onclick="navigateTo('verifikasi')" class="w-10 h-10 rounded-full hover:bg-subtle flex items-center justify-center text-ink-900 transition-colors">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+                  </svg>
+                </button>
+                <div>
+                  <h1 class="text-lg sm:text-xl font-bold text-ink-900">Detail CPB</h1>
+                  <div class="text-xs sm:text-sm font-mono text-ink-500 tabular-nums mt-0.5">${warga.nik}</div>
+                </div>
+              </div>
+
+              <!-- Status Pill ("Direkomendasikan" / "Tidak Direkomendasikan") -->
+              <span class="px-4 py-1.5 rounded-full text-xs font-semibold border ${warga.direkomendasikan ? 'bg-bsps-green text-bsps-greenText border-emerald-200' : 'bg-bsps-red text-bsps-redText border-red-200'}">
+                ${warga.direkomendasikan ? 'Direkomendasikan' : 'Tidak Direkomendasikan'}
+              </span>
+            </div>
+
+            <!-- Bar Ringkasan Nama Warga & Urutan Prioritas -->
+            <div class="px-6 sm:px-8 py-3 bg-page border-y border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div>
+                <span class="font-bold text-ink-900">${warga.nama}</span>
+                <span class="text-ink-500"> — Kel. ${warga.kelurahan}, Kec. ${warga.kecamatan}</span>
+              </div>
+              <div class="font-semibold text-brand-blue">
+                ${warga.direkomendasikan ? `Urutan Prioritas #${warga.peringkat} (Skor ${warga.skorAkhir})` : `Ditunda / Tidak Layak (Skor ${warga.skorAkhir})`}
+              </div>
+            </div>
+
+            <!-- Horizontal Tabs (Informasi Dasar | Data Pendukung | Struktur | Sanitasi & Luas) -->
+            <div class="px-6 sm:px-8 border-b border-slate-200 flex items-center gap-6 overflow-x-auto no-scrollbar">
+              <button
+                onclick="activeDetailTab = 'informasi'; renderApp();"
+                class="py-4 text-xs sm:text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${activeDetailTab === 'informasi' ? 'border-teal-700 text-ink-900' : 'border-transparent text-ink-500 hover:text-ink-900'}"
+              >
+                Informasi Dasar
+              </button>
+              <button
+                onclick="activeDetailTab = 'pendukung'; renderApp();"
+                class="py-4 text-xs sm:text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${activeDetailTab === 'pendukung' ? 'border-teal-700 text-ink-900' : 'border-transparent text-ink-500 hover:text-ink-900'}"
+              >
+                Data Pendukung
+              </button>
+              <button
+                onclick="activeDetailTab = 'struktur'; renderApp();"
+                class="py-4 text-xs sm:text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${activeDetailTab === 'struktur' ? 'border-teal-700 text-ink-900' : 'border-transparent text-ink-500 hover:text-ink-900'}"
+              >
+                Struktur
+              </button>
+              <button
+                onclick="activeDetailTab = 'sanitasi'; renderApp();"
+                class="py-4 text-xs sm:text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${activeDetailTab === 'sanitasi' ? 'border-teal-700 text-ink-900' : 'border-transparent text-ink-500 hover:text-ink-900'}"
+              >
+                Sanitasi & Luas
+              </button>
+            </div>
+
+            <!-- ISI TAB -->
+            <div class="p-6 sm:p-8">
+
+              <!-- TAB 3: STRUKTUR (Persis Gambar ke-3: 1. Pondasi, 2. Sloof, 3. Kolom, 4. Atap, 5. Dinding, 6. Lantai) -->
+              ${activeDetailTab === 'struktur' ? `
+                <div class="space-y-8">
+                  <div class="p-4 rounded-2xl bg-page border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <span class="text-ink-700">Anda dapat mengubah nilai kondisi di bawah ini untuk memperbarui urutan prioritas secara langsung.</span>
+                    <span class="font-semibold text-ink-900">Grade A (Baik) • B (Rapuh Sebagian) • C (Rusak Berat)</span>
+                  </div>
+
+                  <!-- 1. Pondasi -->
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                      <label class="text-sm font-semibold text-ink-900">1. Pondasi</label>
+                      <select
+                        onchange="updateNilaiWarga(${warga.id}, 'pondasi', this.value)"
+                        class="px-3 py-1.5 rounded-xl bg-subtle text-xs font-semibold text-ink-900 border border-slate-200 focus:outline-none focus:border-brand-blue"
+                      >
+                        <option value="2" ${warga.pondasi <= 2 ? 'selected' : ''}>Skala 2 - Baik & Kokoh (Grade A)</option>
+                        <option value="4" ${warga.pondasi === 3 || warga.pondasi === 4 ? 'selected' : ''}>Skala 4 - Sebagian Rapuh (Grade B)</option>
+                        <option value="5" ${warga.pondasi >= 5 ? 'selected' : ''}>Skala 5 - Rusak Berat / Ambles (Grade C)</option>
+                      </select>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <div class="flex-1 px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-700">
+                        ${infoPondasi.teks}
+                      </div>
+                      <div class="w-11 h-11 rounded-full border flex items-center justify-center font-bold text-sm shrink-0 ${infoPondasi.badgeClass}">
+                        ${infoPondasi.huruf}
+                      </div>
+                    </div>
+                    <img
+                      src="${FOTO_KOMPONEN.pondasi}"
+                      onerror="this.src='https://placehold.co/800x450/E2E8F0/475569?text=Foto+Pondasi'"
+                      alt="Foto Pondasi"
+                      class="w-full h-48 sm:h-56 object-cover rounded-2xl border border-slate-200"
+                    />
+                  </div>
+
+                  <!-- 2. Sloof -->
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                      <label class="text-sm font-semibold text-ink-900">2. Sloof</label>
+                      <select
+                        onchange="updateNilaiWarga(${warga.id}, 'sloof', this.value)"
+                        class="px-3 py-1.5 rounded-xl bg-subtle text-xs font-semibold text-ink-900 border border-slate-200 focus:outline-none focus:border-brand-blue"
+                      >
+                        <option value="2" ${warga.sloof <= 2 ? 'selected' : ''}>Skala 2 - Baik & Kokoh (Grade A)</option>
+                        <option value="4" ${warga.sloof === 3 || warga.sloof === 4 ? 'selected' : ''}>Skala 4 - Sebagian Rapuh (Grade B)</option>
+                        <option value="5" ${warga.sloof >= 5 ? 'selected' : ''}>Skala 5 - Rusak Berat / Patah (Grade C)</option>
+                      </select>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <div class="flex-1 px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-700">
+                        ${infoSloof.teks}
+                      </div>
+                      <div class="w-11 h-11 rounded-full border flex items-center justify-center font-bold text-sm shrink-0 ${infoSloof.badgeClass}">
+                        ${infoSloof.huruf}
+                      </div>
+                    </div>
+                    <img
+                      src="${FOTO_KOMPONEN.sloof}"
+                      onerror="this.src='https://placehold.co/800x450/E2E8F0/475569?text=Foto+Sloof'"
+                      alt="Foto Sloof"
+                      class="w-full h-48 sm:h-56 object-cover rounded-2xl border border-slate-200"
+                    />
+                  </div>
+
+                  <!-- 3. Kolom -->
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                      <label class="text-sm font-semibold text-ink-900">3. Kolom / Tiang Penyangga</label>
+                      <select
+                        onchange="updateNilaiWarga(${warga.id}, 'kolom', this.value)"
+                        class="px-3 py-1.5 rounded-xl bg-subtle text-xs font-semibold text-ink-900 border border-slate-200 focus:outline-none focus:border-brand-blue"
+                      >
+                        <option value="2" ${warga.kolom <= 2 ? 'selected' : ''}>Skala 2 - Baik & Kokoh (Grade A)</option>
+                        <option value="4" ${warga.kolom === 3 || warga.kolom === 4 ? 'selected' : ''}>Skala 4 - Sebagian Rapuh (Grade B)</option>
+                        <option value="5" ${warga.kolom >= 5 ? 'selected' : ''}>Skala 5 - Retak Parah / Miring (Grade C)</option>
+                      </select>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <div class="flex-1 px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-700">
+                        ${infoKolom.teks}
+                      </div>
+                      <div class="w-11 h-11 rounded-full border flex items-center justify-center font-bold text-sm shrink-0 ${infoKolom.badgeClass}">
+                        ${infoKolom.huruf}
+                      </div>
+                    </div>
+                    <img
+                      src="${FOTO_KOMPONEN.kolom}"
+                      onerror="this.src='https://placehold.co/800x450/E2E8F0/475569?text=Foto+Kolom'"
+                      alt="Foto Kolom"
+                      class="w-full h-48 sm:h-56 object-cover rounded-2xl border border-slate-200"
+                    />
+                  </div>
+
+                  <!-- 4. Kondisi Atap -->
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                      <label class="text-sm font-semibold text-ink-900">4. Kondisi Atap</label>
+                      <select
+                        onchange="updateNilaiWarga(${warga.id}, 'atap', this.value)"
+                        class="px-3 py-1.5 rounded-xl bg-subtle text-xs font-semibold text-ink-900 border border-slate-200 focus:outline-none focus:border-brand-blue"
+                      >
+                        <option value="2" ${warga.atap <= 2 ? 'selected' : ''}>Skala 2 - Baik, Tidak Bocor (Grade A)</option>
+                        <option value="4" ${warga.atap === 3 || warga.atap === 4 ? 'selected' : ''}>Skala 4 - Bocor Sebagian (Grade B)</option>
+                        <option value="5" ${warga.atap >= 5 ? 'selected' : ''}>Skala 5 - Bocor Parah / Kayu Lapuk (Grade C)</option>
+                      </select>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <div class="flex-1 px-4 py-3.5 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-700">
+                        ${infoAtap.teks}
+                      </div>
+                      <div class="w-11 h-11 rounded-full border flex items-center justify-center font-bold text-sm shrink-0 ${infoAtap.badgeClass}">
+                        ${infoAtap.huruf}
+                      </div>
+                    </div>
+                    <img
+                      src="${FOTO_KOMPONEN.atap}"
+                      onerror="this.src='https://placehold.co/800x450/E2E8F0/475569?text=Foto+Atap'"
+                      alt="Foto Atap"
+                      class="w-full h-48 sm:h-56 object-cover rounded-2xl border border-slate-200"
+                    />
+                  </div>
+
+                  <!-- 5. Kondisi Dinding & 6. Lantai -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                    <div class="space-y-3">
+                      <div class="flex items-center justify-between">
+                        <label class="text-sm font-semibold text-ink-900">5. Kondisi Dinding</label>
+                        <select
+                          onchange="updateNilaiWarga(${warga.id}, 'dinding', this.value)"
+                          class="px-2.5 py-1 rounded-xl bg-subtle text-xs font-semibold text-ink-900 border border-slate-200"
+                        >
+                          <option value="2" ${warga.dinding <= 2 ? 'selected' : ''}>Skala 2 (A)</option>
+                          <option value="4" ${warga.dinding === 3 || warga.dinding === 4 ? 'selected' : ''}>Skala 4 (B)</option>
+                          <option value="5" ${warga.dinding >= 5 ? 'selected' : ''}>Skala 5 (C)</option>
+                        </select>
+                      </div>
+                      <div class="flex items-center gap-2.5">
+                        <div class="flex-1 px-3.5 py-3 rounded-2xl bg-page border border-slate-200 text-xs text-ink-700">
+                          ${infoDinding.teks}
+                        </div>
+                        <div class="w-10 h-10 rounded-full border flex items-center justify-center font-bold text-xs shrink-0 ${infoDinding.badgeClass}">
+                          ${infoDinding.huruf}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="space-y-3">
+                      <div class="flex items-center justify-between">
+                        <label class="text-sm font-semibold text-ink-900">6. Kondisi Lantai</label>
+                        <select
+                          onchange="updateNilaiWarga(${warga.id}, 'lantai', this.value)"
+                          class="px-2.5 py-1 rounded-xl bg-subtle text-xs font-semibold text-ink-900 border border-slate-200"
+                        >
+                          <option value="2" ${warga.lantai <= 2 ? 'selected' : ''}>Skala 2 (A)</option>
+                          <option value="4" ${warga.lantai === 3 || warga.lantai === 4 ? 'selected' : ''}>Skala 4 (B)</option>
+                          <option value="5" ${warga.lantai >= 5 ? 'selected' : ''}>Skala 5 (C)</option>
+                        </select>
+                      </div>
+                      <div class="flex items-center gap-2.5">
+                        <div class="flex-1 px-3.5 py-3 rounded-2xl bg-page border border-slate-200 text-xs text-ink-700">
+                          ${infoLantai.teks}
+                        </div>
+                        <div class="w-10 h-10 rounded-full border flex items-center justify-center font-bold text-xs shrink-0 ${infoLantai.badgeClass}">
+                          ${infoLantai.huruf}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- TAB 1: INFORMASI DASAR (Demografi & Sosial Ekonomi Penghuni) -->
+              ${activeDetailTab === 'informasi' ? `
+                <div class="space-y-6">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl bg-page border border-slate-200/70">
+                      <div class="text-xs text-ink-500">Nama Lengkap Kepala Keluarga</div>
+                      <div class="text-sm font-bold text-ink-900 mt-1">${warga.nama} (${warga.usia} Tahun)</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-page border border-slate-200/70">
+                      <div class="text-xs text-ink-500">Nomor KK & NIK</div>
+                      <div class="text-sm font-mono font-semibold text-ink-900 mt-1 tabular-nums">${warga.nik}</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-page border border-slate-200/70">
+                      <div class="text-xs text-ink-500">Wilayah Kecamatan & Kelurahan</div>
+                      <div class="text-sm font-bold text-ink-900 mt-1">Kel. ${warga.kelurahan}, Kec. ${warga.kecamatan}</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-page border border-slate-200/70">
+                      <div class="text-xs text-ink-500">Pekerjaan Utama</div>
+                      <div class="text-sm font-bold text-ink-900 mt-1">${warga.pekerjaan}</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-page border border-slate-200/70">
+                      <div class="text-xs text-ink-500">Penghasilan Rata-Rata per Bulan</div>
+                      <div class="text-sm font-bold text-ink-900 mt-1 tabular-nums">${formatRupiah(warga.penghasilan)} (MBR)</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-page border border-slate-200/70">
+                      <div class="text-xs text-ink-500">Jumlah Tanggungan & Kerentanan</div>
+                      <div class="text-sm font-bold text-ink-900 mt-1">${warga.tanggungan} Orang (${warga.kondisiRentan})</div>
+                    </div>
+                  </div>
+
+                  <div class="p-4 rounded-2xl bg-page border border-slate-200/70 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs font-bold text-ink-900">Terdaftar di DTKS (Data Terpadu Kesejahteraan Sosial)</div>
+                      <p class="text-xs text-ink-500 mt-0.5">Menambah bobot prioritas ekonomi warga miskin ekstrem.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      ${warga.dtks ? 'checked' : ''}
+                      onchange="updateBooleanWarga(${warga.id}, 'dtks', this.checked)"
+                      class="w-5 h-5 rounded border-slate-300 text-brand-blue"
+                    />
+                  </div>
+
+                  <div class="p-4 rounded-2xl bg-page border border-slate-200/70 space-y-1">
+                    <div class="text-xs font-bold text-ink-900">Alamat Lengkap & Catatan Petugas</div>
+                    <p class="text-xs text-ink-700">${warga.alamat}</p>
+                    <p class="text-xs text-ink-500 pt-1">${warga.catatanLapangan}</p>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- TAB 2: DATA PENDUKUNG (Legalitas Tanah, Lokasi & Kesediaan Swadaya) -->
+              ${activeDetailTab === 'pendukung' ? `
+                <div class="space-y-5">
+                  <div class="p-4 rounded-2xl bg-brand-blueSoft border border-blue-200/70 text-xs text-ink-700 leading-relaxed">
+                    <strong class="text-ink-900">Syarat Wajib Kelayakan:</strong> Rumah hanya dapat <span class="font-bold text-bsps-greenText">Direkomendasikan</span> apabila tanah tidak dalam sengketa, bukan di kawasan terlarang, dan belum menerima bantuan sejenis dalam 5 tahun terakhir.
+                  </div>
+
+                  <div class="p-4 rounded-2xl bg-page border border-slate-200/70">
+                    <div class="text-xs text-ink-500">Bukti Kepemilikan / Alas Hak Tanah</div>
+                    <div class="text-sm font-bold text-ink-900 mt-1">${warga.buktiTanah}</div>
+                  </div>
+
+                  <div class="space-y-3">
+                    <label class="p-4 rounded-2xl bg-page border border-slate-200/70 flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-xs sm:text-sm font-bold text-ink-900">1. Tanah Bebas Sengketa</div>
+                        <p class="text-xs text-ink-500">Tidak sedang dalam sengketa waris atau pihak lain.</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        ${warga.bebasSengketa ? 'checked' : ''}
+                        onchange="updateBooleanWarga(${warga.id}, 'bebasSengketa', this.checked)"
+                        class="w-5 h-5 rounded border-slate-300 text-brand-blue"
+                      />
+                    </label>
+
+                    <label class="p-4 rounded-2xl bg-page border border-slate-200/70 flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-xs sm:text-sm font-bold text-ink-900">2. Bukan Kawasan Terlarang / Tanah Negara</div>
+                        <p class="text-xs text-ink-500">Tidak berdiri di atas sempadan sungai, jalur hijau, atau aset pemerintah.</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        ${warga.bukanKawasanTerlarang ? 'checked' : ''}
+                        onchange="updateBooleanWarga(${warga.id}, 'bukanKawasanTerlarang', this.checked)"
+                        class="w-5 h-5 rounded border-slate-300 text-brand-blue"
+                      />
+                    </label>
+
+                    <label class="p-4 rounded-2xl bg-page border border-slate-200/70 flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-xs sm:text-sm font-bold text-ink-900">3. Belum Pernah Menerima Bantuan RTLH (5 Tahun Terakhir)</div>
+                        <p class="text-xs text-ink-500">Sesuai verifikasi NIK pada database Kota Tegal.</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        ${warga.belumPernahBantuan ? 'checked' : ''}
+                        onchange="updateBooleanWarga(${warga.id}, 'belumPernahBantuan', this.checked)"
+                        class="w-5 h-5 rounded border-slate-300 text-brand-blue"
+                      />
+                    </label>
+
+                    <label class="p-4 rounded-2xl bg-page border border-slate-200/70 flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-xs sm:text-sm font-bold text-ink-900">4. Kesediaan Swadaya / Gotong Royong</div>
+                        <p class="text-xs text-ink-500">Pemilik rumah bersedia ikut berpartisipasi saat perbaikan rumah.</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        ${warga.swadaya ? 'checked' : ''}
+                        onchange="updateBooleanWarga(${warga.id}, 'swadaya', this.checked)"
+                        class="w-5 h-5 rounded border-slate-300 text-brand-blue"
+                      />
+                    </label>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- TAB 4: SANITASI & LUAS HUNIAN -->
+              ${activeDetailTab === 'sanitasi' ? `
+                <div class="space-y-6">
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <label class="text-sm font-semibold text-ink-900">1. Fasilitas Kamar Mandi (MCK) & Ventilasi</label>
+                      <select
+                        onchange="updateNilaiWarga(${warga.id}, 'sanitasi', this.value)"
+                        class="px-3 py-1.5 rounded-xl bg-subtle text-xs font-semibold text-ink-900 border border-slate-200"
+                      >
+                        <option value="2" ${warga.sanitasi <= 2 ? 'selected' : ''}>Skala 2 - Punya MCK Layak & Terang</option>
+                        <option value="4" ${warga.sanitasi === 3 || warga.sanitasi === 4 ? 'selected' : ''}>Skala 4 - MCK Kurang Layak & Lembab</option>
+                        <option value="5" ${warga.sanitasi >= 5 ? 'selected' : ''}>Skala 5 - Tidak Punya MCK Pribadi</option>
+                      </select>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-700">
+                      ${getDeskripsiKondisi(warga.sanitasi).teks}
+                    </div>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <label class="text-sm font-semibold text-ink-900">2. Kecukupan Luas Bangunan (${warga.luasMeter} m² untuk ${warga.tanggungan + 1} Penghuni)</label>
+                      <select
+                        onchange="updateNilaiWarga(${warga.id}, 'luasHunian', this.value)"
+                        class="px-3 py-1.5 rounded-xl bg-subtle text-xs font-semibold text-ink-900 border border-slate-200"
+                      >
+                        <option value="2" ${warga.luasHunian <= 2 ? 'selected' : ''}>Skala 2 - Luas Mencukupi Standar</option>
+                        <option value="4" ${warga.luasHunian === 3 || warga.luasHunian === 4 ? 'selected' : ''}>Skala 4 - Sempit / Kurang dari Standar</option>
+                        <option value="5" ${warga.luasHunian >= 5 ? 'selected' : ''}>Skala 5 - Sangat Padat / Tidak Layak</option>
+                      </select>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-700">
+                      Luas rumah saat ini ${warga.luasMeter} m² dihuni oleh ${warga.tanggungan + 1} anggota keluarga.
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+
+            </div>
+
+            <!-- Footer Detail CPB -->
+            <div class="px-6 sm:px-8 py-4 bg-page border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-xs text-ink-500">
+                Rincian Skor: Fisik <strong class="text-ink-900">${warga.skorFisik}</strong> + Sosial Ekonomi <strong class="text-ink-900">${warga.skorEkonomi}</strong> + Swadaya <strong class="text-ink-900">${warga.skorSwadaya}</strong> = <strong class="text-brand-blue">${warga.skorAkhir}/100</strong>
+              </div>
+              <button onclick="navigateTo('verifikasi')" class="px-5 py-2.5 rounded-full bg-brand-dark text-white text-xs font-bold hover:bg-slate-800 transition-colors">
+                Selesai & Kembali ke Daftar
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function updateNilaiWarga(id, field, nilaiBaru) {
+      const target = databaseWarga.find(w => w.id === Number(id));
+      if (!target) return;
+      target[field] = Number(nilaiBaru);
+      renderApp();
+      showToast("Nilai kondisi bangunan berhasil diperbarui & dihitung ulang");
+    }
+
+    function updateBooleanWarga(id, field, statusBaru) {
+      const target = databaseWarga.find(w => w.id === Number(id));
+      if (!target) return;
+      target[field] = Boolean(statusBaru);
+      renderApp();
+      showToast("Status verifikasi diperbarui secara otomatis");
+    }
+
+    // E. HALAMAN INPUT SURVEY BARU
+    function renderSurveyPage() {
+      const daftarKelurahan = MASTER_WILAYAH["Tegal Barat"];
+      return `
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 space-y-6 page-fade">
+
+          <div class="flex items-center gap-3">
+            <button onclick="navigateTo('home')" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-ink-700 hover:bg-subtle">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-lg sm:text-xl font-bold text-ink-900">Input Survey Rumah Warga Baru</h1>
+              <p class="text-xs text-ink-500">Data yang disimpan akan langsung dihitung skornya dan masuk ke urutan prioritas Kota Tegal.</p>
+            </div>
+          </div>
+
+          <form onsubmit="simpanSurveyBaru(event)" class="bg-white rounded-[28px] p-6 sm:p-8 border border-slate-200/80 shadow-card space-y-7">
+
+            <!-- Bagian 1: Identitas & Alamat -->
+            <div class="space-y-4">
+              <h2 class="text-sm font-bold text-brand-blue uppercase tracking-wider">1. Data Warga & Lokasi Rumah</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Nama Lengkap Kepala Keluarga</label>
+                  <input id="inpNama" type="text" required placeholder="Contoh: Bapak Tarno" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Nomor Induk Kependudukan (NIK)</label>
+                  <input id="inpNik" type="text" required value="3376015509750004" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm font-mono text-ink-900 focus:outline-none focus:border-brand-blue" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Kecamatan (Kota Tegal)</label>
+                  <select id="inpKecamatan" onchange="perbaruiOpsiKelurahanForm(this.value)" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue">
+                    ${Object.keys(MASTER_WILAYAH).map(kec => `<option value="${kec}">${kec}</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Kelurahan</label>
+                  <select id="inpKelurahan" onchange="sinkronKoordinatKelurahan(this.value)" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue">
+                    ${daftarKelurahan.map(kel => `<option value="${kel}">${kel}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-ink-700 mb-1.5">Alamat Lengkap (Jalan / RT / RW)</label>
+                <input id="inpAlamat" type="text" required placeholder="Contoh: Jl. Blanak RT 03 / RW 02" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900 focus:outline-none focus:border-brand-blue" />
+              </div>
+
+              <!-- Peta Mini Pilih Titik Koordinat Rumah di Kota Tegal -->
+              <div class="pt-2 space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <label class="block text-xs font-semibold text-ink-700">Titik Koordinat GPS Rumah (Klik pada Peta Kota Tegal untuk Geser Pin)</label>
+                  <span class="text-[11px] font-mono text-brand-blue" id="labelKoordinatInput">-6.8525, 109.1115</span>
+                </div>
+                <div id="surveyMapContainer" class="w-full h-56 rounded-2xl border border-slate-200 overflow-hidden bg-slate-100"></div>
+                <input type="hidden" id="inpLat" value="-6.8525" />
+                <input type="hidden" id="inpLng" value="109.1115" />
+              </div>
+            </div>
+
+            <!-- Bagian 2: Sosial Ekonomi -->
+            <div class="space-y-4 pt-4 border-t border-slate-100">
+              <h2 class="text-sm font-bold text-brand-blue uppercase tracking-wider">2. Kondisi Ekonomi & Keluarga</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Pekerjaan</label>
+                  <input id="inpPekerjaan" type="text" required value="Buruh Harian Lepas" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Penghasilan / Bulan (Rp)</label>
+                  <input id="inpPenghasilan" type="number" required value="950000" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Jumlah Tanggungan</label>
+                  <input id="inpTanggungan" type="number" required value="4" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-sm text-ink-900" />
+                </div>
+              </div>
+              <label class="inline-flex items-center gap-2.5 text-xs font-semibold text-ink-700 cursor-pointer">
+                <input id="inpDtks" type="checkbox" checked class="w-4 h-4 rounded text-brand-blue" />
+                <span>Keluarga ini terdaftar di DTKS (Data Terpadu Kesejahteraan Sosial)</span>
+              </label>
+            </div>
+
+            <!-- Bagian 3: Penilaian Fisik Bangunan -->
+            <div class="space-y-4 pt-4 border-t border-slate-100">
+              <h2 class="text-sm font-bold text-brand-blue uppercase tracking-wider">3. Kondisi Fisik Bangunan (Skala 1 - 5)</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Kondisi Atap</label>
+                  <select id="inpAtap" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-900">
+                    <option value="5">Skala 5 - Bocor Parah / Rangka Lapuk (C)</option>
+                    <option value="4">Skala 4 - Sebagian Rapuh / Bocor (B)</option>
+                    <option value="2">Skala 2 - Kondisi Baik (A)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Kondisi Dinding</label>
+                  <select id="inpDinding" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-900">
+                    <option value="5">Skala 5 - Bambu Rusak / Nyaris Roboh (C)</option>
+                    <option value="4">Skala 4 - Sebagian Retak / Rapuh (B)</option>
+                    <option value="2">Skala 2 - Tembok Baik (A)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Kondisi Lantai</label>
+                  <select id="inpLantai" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-900">
+                    <option value="5">Skala 5 - Masih Tanah / Hancur Berat (C)</option>
+                    <option value="4">Skala 4 - Plester Rusak Sebagian (B)</option>
+                    <option value="2">Skala 2 - Keramik / Semen Baik (A)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-ink-700 mb-1.5">Struktur Pondasi, Sloof & Kolom</label>
+                  <select id="inpStruktur" class="w-full px-4 py-3 rounded-2xl bg-page border border-slate-200 text-xs sm:text-sm text-ink-900">
+                    <option value="4">Skala 4 - Ada, Sebagian Rapuh & Tidak Kokoh (B)</option>
+                    <option value="5">Skala 5 - Rusak Berat / Tidak Ada Sloof (C)</option>
+                    <option value="2">Skala 2 - Kokoh & Layak (A)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bagian 4: Legalitas Tanah -->
+            <div class="space-y-3 pt-4 border-t border-slate-100">
+              <h2 class="text-sm font-bold text-brand-blue uppercase tracking-wider">4. Surat Tanah & Kesediaan Gotong Royong</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <label class="p-3.5 rounded-2xl bg-page border border-slate-200 flex items-center gap-2.5 cursor-pointer">
+                  <input id="inpBebasSengketa" type="checkbox" checked class="w-4 h-4 rounded text-brand-blue" />
+                  <span class="font-semibold text-ink-900">Tanah milik sendiri & bebas sengketa</span>
+                </label>
+                <label class="p-3.5 rounded-2xl bg-page border border-slate-200 flex items-center gap-2.5 cursor-pointer">
+                  <input id="inpSwadaya" type="checkbox" checked class="w-4 h-4 rounded text-brand-blue" />
+                  <span class="font-semibold text-ink-900">Bersedia ikut swadaya / gotong royong</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="pt-3 flex items-center justify-end gap-3">
+              <button type="button" onclick="navigateTo('home')" class="px-5 py-3.5 rounded-full bg-subtle text-ink-700 text-xs font-bold">
+                Batal
+              </button>
+              <button type="submit" class="px-6 py-3.5 rounded-full bg-brand-dark hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors">
+                Simpan & Hitung Urutan Prioritas
+              </button>
+            </div>
+          </form>
+
+        </div>
+      `;
+    }
+
+    function perbaruiOpsiKelurahanForm(kecamatan) {
+      const selectKel = document.getElementById('inpKelurahan');
+      if (!selectKel) return;
+      const daftar = MASTER_WILAYAH[kecamatan] || [];
+      selectKel.innerHTML = daftar.map(k => `<option value="${k}">${k}</option>`).join('');
+      if (daftar.length > 0) {
+        sinkronKoordinatKelurahan(daftar[0]);
+      }
+    }
+
+    function sinkronKoordinatKelurahan(kelurahan) {
+      const koord = KOORDINAT_KELURAHAN[kelurahan] || [-6.8694, 109.1250];
+      const latInput = document.getElementById('inpLat');
+      const lngInput = document.getElementById('inpLng');
+      const label = document.getElementById('labelKoordinatInput');
+      if (latInput && lngInput) {
+        latInput.value = koord[0].toFixed(4);
+        lngInput.value = koord[1].toFixed(4);
+      }
+      if (label) {
+        label.textContent = `${koord[0].toFixed(4)}, ${koord[1].toFixed(4)} (Kel. ${kelurahan})`;
+      }
+      if (surveyMiniMap && surveyMarker) {
+        surveyMiniMap.flyTo(koord, 15, { duration: 0.6 });
+        surveyMarker.setLatLng(koord);
+      }
+    }
+
+    function initSurveyMiniMap() {
+      const container = document.getElementById('surveyMapContainer');
+      if (!container || typeof L === 'undefined') return;
+      if (surveyMiniMap) {
+        surveyMiniMap.remove();
+        surveyMiniMap = null;
+      }
+      const initialCoords = [-6.8525, 109.1115];
+      surveyMiniMap = L.map('surveyMapContainer').setView(initialCoords, 15);
+      // Gunakan Esri World Street Map Resmi (100% Bebas API Key & Bebas Blokir Iframe)
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri — Kota Tegal'
+      }).addTo(surveyMiniMap);
+
+      surveyMarker = L.marker(initialCoords, { draggable: true }).addTo(surveyMiniMap);
+
+      function updateLatLngFields(latlng) {
+        const latEl = document.getElementById('inpLat');
+        const lngEl = document.getElementById('inpLng');
+        const label = document.getElementById('labelKoordinatInput');
+        if (latEl && lngEl) {
+          latEl.value = latlng.lat.toFixed(4);
+          lngEl.value = latlng.lng.toFixed(4);
+        }
+        if (label) {
+          label.textContent = `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`;
+        }
+      }
+
+      surveyMiniMap.on('click', function (e) {
+        surveyMarker.setLatLng(e.latlng);
+        updateLatLngFields(e.latlng);
+      });
+
+      surveyMarker.on('dragend', function (e) {
+        updateLatLngFields(e.target.getLatLng());
+      });
+
+      setTimeout(() => {
+        if (surveyMiniMap) surveyMiniMap.invalidateSize();
+      }, 200);
+    }
+
+    function simpanSurveyBaru(e) {
+      e.preventDefault();
+      const nama = document.getElementById('inpNama').value.trim();
+      const nik = document.getElementById('inpNik').value.trim();
+      const kecamatan = document.getElementById('inpKecamatan').value;
+      const kelurahan = document.getElementById('inpKelurahan').value;
+      const alamat = document.getElementById('inpAlamat').value.trim();
+      const pekerjaan = document.getElementById('inpPekerjaan').value.trim();
+      const penghasilan = Number(document.getElementById('inpPenghasilan').value) || 1000000;
+      const tanggungan = Number(document.getElementById('inpTanggungan').value) || 3;
+      const dtks = document.getElementById('inpDtks').checked;
+      const atap = Number(document.getElementById('inpAtap').value);
+      const dinding = Number(document.getElementById('inpDinding').value);
+      const lantai = Number(document.getElementById('inpLantai').value);
+      const struktur = Number(document.getElementById('inpStruktur').value);
+      const bebasSengketa = document.getElementById('inpBebasSengketa').checked;
+      const swadaya = document.getElementById('inpSwadaya').checked;
+      const lat = parseFloat(document.getElementById('inpLat')?.value) || (KOORDINAT_KELURAHAN[kelurahan]?.[0] ?? -6.8694);
+      const lng = parseFloat(document.getElementById('inpLng')?.value) || (KOORDINAT_KELURAHAN[kelurahan]?.[1] ?? 109.1250);
+
+      const idBaru = databaseWarga.length + 1;
+      databaseWarga.push({
+        id: idBaru,
+        nik,
+        noKk: "337601120918000" + idBaru,
+        nama,
+        usia: 50,
+        pekerjaan,
+        kecamatan,
+        kelurahan,
+        alamat: `${alamat}, Kel. ${kelurahan}`,
+        penghasilan,
+        tanggungan,
+        dtks,
+        kondisiRentan: `${tanggungan} Anggota Keluarga`,
+        swadaya,
+        pondasi: struktur,
+        sloof: struktur,
+        kolom: struktur,
+        atap,
+        dinding,
+        lantai,
+        sanitasi: 4,
+        luasHunian: 4,
+        luasMeter: 30,
+        buktiTanah: bebasSengketa ? "Sertifikat / Surat Keterangan Kelurahan" : "Masih Dalam Sengketa",
+        bebasSengketa,
+        bukanKawasanTerlarang: true,
+        belumPernahBantuan: true,
+        surveyor: currentUser.nama,
+        catatanLapangan: `Data hasil survei lapangan oleh ${currentUser.nama}.`,
+        fotoRumah: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=900&q=80",
+        lat,
+        lng
+      });
+
+      selectedWargaId = idBaru;
+      activeDetailTab = 'struktur';
+      navigateTo('detail', idBaru);
+      showToast(`Data ${nama} berhasil disimpan oleh ${currentUser.nama}`);
+    }
+
+    // F. HALAMAN PETA SEBARAN RTLH ASLI KOTA TEGAL (CARTO VOYAGER HD, ESRI STREET & SATELIT HYBRID)
+    function renderPetaPage() {
+      const daftarPrioritas = getDaftarPrioritas();
+      const daftarFilterPeta = activeMapKecamatan === 'Semua'
+        ? daftarPrioritas
+        : daftarPrioritas.filter(w => w.kecamatan === activeMapKecamatan);
+
+      const wargaTerpilih = daftarFilterPeta.find(w => w.id === Number(selectedWargaId))
+        || daftarPrioritas.find(w => w.id === Number(selectedWargaId))
+        || daftarPrioritas[0];
+
+      return `
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 space-y-6 page-fade">
+
+          <!-- Header Peta & Pilihan 3 Mode Peta Bebas Blokir -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <button onclick="navigateTo('home')" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-ink-700 hover:bg-subtle shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+                </svg>
+              </button>
+              <div>
+                <h1 class="text-lg sm:text-xl font-bold text-ink-900">Peta Wilayah & Sebaran RTLH Kota Tegal</h1>
+                <p class="text-xs text-ink-500">Peta interaktif 4 Kecamatan & 27 Kelurahan Kota Tegal. Klik wilayah atau pin rumah warga.</p>
+              </div>
+            </div>
+            <!-- Toggle 3 Mode Peta Bebas API Key (Esri Street / Esri Topo / Satelit Hybrid) -->
+            <div class="inline-flex p-1 rounded-2xl bg-white border border-slate-200 shadow-2xs self-start md:self-auto overflow-x-auto max-w-full">
+              <button
+                onclick="ubahModePeta('street')"
+                id="btnMapStreet"
+                class="whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${mapMode === 'street' ? 'bg-brand-dark text-white' : 'text-ink-500 hover:text-ink-900'}"
+              >
+                Peta Jalan & Wilayah
+              </button>
+              <button
+                onclick="ubahModePeta('esri')"
+                id="btnMapEsri"
+                class="whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${mapMode === 'esri' ? 'bg-brand-dark text-white' : 'text-ink-500 hover:text-ink-900'}"
+              >
+                Peta Topografi
+              </button>
+              <button
+                onclick="ubahModePeta('satellite')"
+                id="btnMapSat"
+                class="whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${mapMode === 'satellite' ? 'bg-brand-dark text-white' : 'text-ink-500 hover:text-ink-900'}"
+              >
+                Citra Satelit + Jalan
+              </button>
+            </div>
+          </div>
+
+          <!-- Tombol Fokus Cepat 4 Kecamatan Kota Tegal dengan Indikator Warna Wilayah -->
+          <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-card flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold text-ink-500 mr-1">Pilih Wilayah Kecamatan:</span>
+              <button
+                onclick="fokusKecamatanPeta('Semua')"
+                class="whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${activeMapKecamatan === 'Semua' ? 'bg-brand-blue text-white shadow-2xs' : 'bg-page text-ink-700 hover:bg-subtle'}"
+              >
+                Semua Wilayah (Kota Tegal)
+              </button>
+              ${Object.entries(POLIGON_KECAMATAN).map(([kec, info]) => `
+                <button
+                  onclick="fokusKecamatanPeta('${kec}')"
+                  class="whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-2 transition-all ${activeMapKecamatan === kec ? 'bg-brand-blue text-white shadow-2xs' : 'bg-page text-ink-700 hover:bg-subtle'}"
+                >
+                  <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${activeMapKecamatan === kec ? '#FFFFFF' : info.warna};"></span>
+                  <span>Kec. ${kec}</span>
+                </button>
+              `).join('')}
+            </div>
+            <div class="text-xs text-ink-500 whitespace-nowrap">
+              Menampilkan <strong class="text-ink-900">${daftarFilterPeta.length}</strong> titik rumah
+            </div>
+          </div>
+
+          <!-- Grid Utama: Kiri Peta Interaktif Leaflet Kota Tegal, Kanan Detail Rumah Terpilih -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- Kontainer Peta Asli Leaflet.js -->
+            <div class="lg:col-span-8 bg-white rounded-[28px] p-4 sm:p-5 border border-slate-200/80 shadow-card space-y-4">
+              <div id="tegalMapContainer" class="w-full h-[430px] sm:h-[490px] rounded-2xl border border-slate-200 overflow-hidden bg-slate-100"></div>
+
+              <!-- Legenda Wilayah & Status Kelayakan -->
+              <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-ink-500 px-1 pt-1">
+                <div class="flex flex-wrap items-center gap-4">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>
+                    <span>Direkomendasikan (Prioritas #1, #2, dst.)</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-red-600 inline-block"></span>
+                    <span>Tidak Direkomendasikan (Sengketa Tanah)</span>
+                  </span>
+                </div>
+                <span class="font-mono text-[11px] text-ink-400">Koordinat Kota Tegal: 6°52'LS 109°07'BT</span>
+              </div>
+            </div>
+
+            <!-- Panel Detail Rumah yang Diklik di Peta -->
+            <div id="mapDetailCard" class="lg:col-span-4 bg-white rounded-[28px] p-6 border border-slate-200/80 shadow-card space-y-4">
+              ${renderIsiKartuDetailPeta(wargaTerpilih)}
+            </div>
+
+          </div>
+
+          <!-- Daftar Kelurahan & Titik Rumah pada Kecamatan yang Dipilih -->
+          <div class="bg-white rounded-[28px] p-6 sm:p-7 border border-slate-200/80 shadow-card space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 class="text-base font-bold text-ink-900">
+                  Daftar Titik Rumah di ${activeMapKecamatan === 'Semua' ? 'Seluruh Kota Tegal' : 'Kecamatan ' + activeMapKecamatan}
+                </h3>
+                <p class="text-xs text-ink-500">Klik baris warga untuk mengarahkan peta langsung ke lokasi rumahnya.</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              ${daftarFilterPeta.map(w => `
+                <div
+                  onclick="arahkanKeRumahWarga(${w.id})"
+                  class="cursor-pointer p-4 rounded-2xl border transition-all flex items-start justify-between gap-3 ${w.id === wargaTerpilih.id ? 'bg-brand-blueSoft/60 border-brand-blue' : 'bg-page border-slate-200/80 hover:border-brand-blue'}"
+                >
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${w.direkomendasikan ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}">
+                        ${w.direkomendasikan ? '#' + w.peringkat : 'Ditunda'}
+                      </span>
+                      <span class="text-xs font-bold text-ink-900">${w.nama}</span>
+                    </div>
+                    <div class="text-xs text-ink-500">Kel. ${w.kelurahan}, Kec. ${w.kecamatan}</div>
+                    <div class="text-[11px] font-mono text-ink-400 tabular-nums">${w.lat.toFixed(4)}, ${w.lng.toFixed(4)}</div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <div class="text-xs font-bold text-ink-900 tabular-nums">${w.skorAkhir}</div>
+                    <div class="text-[10px] text-brand-blue font-semibold mt-1">Lihat Pin →</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function renderIsiKartuDetailPeta(warga) {
+      if (!warga) return '';
+      return `
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-brand-blue uppercase tracking-wider">Detail Titik Lokasi</span>
+          <span class="px-3 py-1 rounded-full text-[11px] font-semibold ${warga.direkomendasikan ? 'bg-bsps-green text-bsps-greenText' : 'bg-bsps-red text-bsps-redText'}">
+            ${warga.direkomendasikan ? 'Prioritas #' + warga.peringkat : 'Tdk Direkomen.'}
+          </span>
+        </div>
+
+        <img
+          src="${warga.fotoRumah}"
+          onerror="this.src='https://placehold.co/600x400/E2E8F0/475569?text=Rumah+Warga'"
+          alt="${warga.nama}"
+          class="w-full h-44 rounded-2xl object-cover border border-slate-100"
+        />
+
+        <div class="space-y-1.5">
+          <h3 class="text-base font-bold text-ink-900">${warga.nama}</h3>
+          <div class="text-xs text-ink-500">${warga.alamat}</div>
+          <div class="text-xs font-mono text-brand-blue tabular-nums">
+            Koordinat GPS: ${warga.lat.toFixed(4)}, ${warga.lng.toFixed(4)}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <div class="p-3 rounded-2xl bg-page border border-slate-200/70">
+            <div class="text-ink-400">Kecamatan</div>
+            <div class="font-bold text-ink-900 mt-0.5">${warga.kecamatan}</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-page border border-slate-200/70">
+            <div class="text-ink-400">Kelurahan</div>
+            <div class="font-bold text-ink-900 mt-0.5">${warga.kelurahan}</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-page border border-slate-200/70">
+            <div class="text-ink-400">Skor Prioritas</div>
+            <div class="font-bold text-ink-900 mt-0.5 tabular-nums">${warga.skorAkhir} / 100</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-page border border-slate-200/70">
+            <div class="text-ink-400">Surveyor</div>
+            <div class="font-bold text-ink-900 mt-0.5">${warga.surveyor}</div>
+          </div>
+        </div>
+
+        <button
+          onclick="navigateTo('detail', ${warga.id})"
+          class="w-full py-3 rounded-full bg-brand-dark hover:bg-slate-800 text-white text-xs font-bold transition-colors"
+        >
+          Buka Detail CPB →
+        </button>
+      </div>
+      `;
+    }
+
+    // Inisialisasi & Render Peta Interaktif Asli Kota Tegal menggunakan Leaflet.js + Esri ArcGIS (100% Bebas Blokir & Tanpa API Key)
+    function initRealKotaTegalMap() {
+      const container = document.getElementById('tegalMapContainer');
+      if (!container || typeof L === 'undefined') return;
+
+      if (leafletMap) {
+        leafletMap.remove();
+        leafletMap = null;
+      }
+
+      // Tentukan pusat peta awal Kota Tegal
+      let centerCoords = [-6.8685, 109.1235];
+      let zoomLevel = 14;
+      if (activeMapKecamatan !== 'Semua' && POLIGON_KECAMATAN[activeMapKecamatan]) {
+        centerCoords = POLIGON_KECAMATAN[activeMapKecamatan].center;
+        zoomLevel = 15;
+      }
+
+      leafletMap = L.map('tegalMapContainer', {
+        zoomControl: true,
+        scrollWheelZoom: true
+      }).setView(centerCoords, zoomLevel);
+
+      pasangTileLayerPeta();
+
+      // 1. Gambar Poligon Batas 4 Kecamatan Kota Tegal (Label muncul rapi saat diarahkan kursor agar tidak menumpuk dengan pin rumah)
+      const boundsPoints = [];
+      Object.entries(POLIGON_KECAMATAN).forEach(([namaKec, dataPoligon]) => {
+        const isSelected = activeMapKecamatan === 'Semua' || activeMapKecamatan === namaKec;
+        const polygon = L.polygon(dataPoligon.coords, {
+          color: dataPoligon.warna,
+          weight: isSelected ? 2.5 : 1.5,
+          fillColor: dataPoligon.warna,
+          fillOpacity: activeMapKecamatan === namaKec ? 0.16 : 0.06,
+          dashArray: isSelected ? '' : '6, 6'
+        }).addTo(leafletMap);
+
+        polygon.bindTooltip(`Wilayah Kec. ${namaKec}`, {
+          permanent: false,
+          sticky: true,
+          direction: 'top',
+          className: 'kec-label-tooltip'
+        });
+
+        polygon.on('click', function () {
+          fokusKecamatanPeta(namaKec);
+        });
+      });
+
+      // 2. Gambar Marker Rumah Warga (CPB) dengan Desain Ramping agar Tidak Menumpuk
+      const daftarPrioritas = getDaftarPrioritas();
+      const daftarTampil = activeMapKecamatan === 'Semua'
+        ? daftarPrioritas
+        : daftarPrioritas.filter(w => w.kecamatan === activeMapKecamatan);
+
+      daftarTampil.forEach(w => {
+        boundsPoints.push([w.lat, w.lng]);
+        const bgPin = w.direkomendasikan ? '#059669' : '#DC2626';
+        const labelPin = w.direkomendasikan ? `#${w.peringkat}` : '!';
+        const isSelectedWarga = w.id === Number(selectedWargaId);
+
+        const customIcon = L.divIcon({
+          className: 'custom-rtlh-pin',
+          html: `
+            <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%, -100%);">
+              <div style="
+                background:${bgPin};
+                color:#FFFFFF;
+                padding:3px 8px;
+                border-radius:9999px;
+                font-weight:700;
+                font-size:11px;
+                border:${isSelectedWarga ? '2.5px solid #0F172A' : '2px solid #FFFFFF'};
+                box-shadow:0 4px 10px rgba(15,23,42,0.24);
+                display:inline-flex;
+                align-items:center;
+                gap:4px;
+                white-space:nowrap;
+              ">
+                <span>${labelPin}</span>
+                <span style="font-weight:600;">${w.kelurahan}</span>
+              </div>
+              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid ${bgPin};margin-top:-1px;"></div>
+            </div>
+          `,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0]
+        });
+
+        const marker = L.marker([w.lat, w.lng], { icon: customIcon }).addTo(leafletMap);
+
+        const popupHtml = `
+          <div style="min-width:210px; font-family:'Plus Jakarta Sans',sans-serif;">
+            <div style="font-size:10px; font-weight:700; color:${bgPin}; text-transform:uppercase; margin-bottom:2px;">
+              ${w.direkomendasikan ? 'Prioritas #' + w.peringkat + ' • Direkomendasikan' : 'Tidak Direkomendasikan'}
+            </div>
+            <div style="font-size:13px; font-weight:700; color:#0F172A;">${w.nama}</div>
+            <div style="font-size:11px; color:#64748B; margin-bottom:8px;">Kel. ${w.kelurahan}, Kec. ${w.kecamatan}</div>
+            <div style="font-size:11px; color:#334155; background:#F8FAFC; padding:6px 8px; border-radius:10px; margin-bottom:8px;">
+              Skor SPK: <strong>${w.skorAkhir}/100</strong><br/>
+              Atap: ${w.atap}/5 • Dinding: ${w.dinding}/5 • Lantai: ${w.lantai}/5
+            </div>
+            <button
+              onclick="navigateTo('detail', ${w.id})"
+              style="width:100%; background:#141B2D; color:#FFFFFF; border:none; padding:7px 10px; border-radius:9999px; font-size:11px; font-weight:700; cursor:pointer;"
+            >
+              Buka Detail CPB →
+            </button>
+          </div>
+        `;
+
+        marker.bindPopup(popupHtml);
+
+        marker.on('click', function () {
+          selectedWargaId = w.id;
+          const cardEl = document.getElementById('mapDetailCard');
+          if (cardEl) {
+            cardEl.innerHTML = renderIsiKartuDetailPeta(w);
+          }
+        });
+      });
+
+      // Sesuaikan otomatis batas pandang (zoom & posisi) agar semua pin terlihat proporsional dan tidak menumpuk
+      if (boundsPoints.length > 1) {
+        leafletMap.fitBounds(boundsPoints, { padding: [48, 48], maxZoom: 15 });
+      } else if (boundsPoints.length === 1) {
+        leafletMap.setView(boundsPoints[0], 15);
+      }
+
+      // Pastikan ukuran peta ter-render sempurna
+      setTimeout(() => {
+        if (leafletMap) leafletMap.invalidateSize();
+      }, 220);
+    }
+
+    function pasangTileLayerPeta() {
+      if (!leafletMap) return;
+      if (leafletTileLayer) {
+        leafletMap.removeLayer(leafletTileLayer);
+        leafletTileLayer = null;
+      }
+      if (leafletLabelLayer) {
+        leafletMap.removeLayer(leafletLabelLayer);
+        leafletLabelLayer = null;
+      }
+
+      if (mapMode === 'satellite') {
+        // Citra Satelit Esri + Overlay Transparan Nama Jalan & Kelurahan Kota Tegal (100% Bebas API Key)
+        leafletTileLayer = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri — Citra Satelit Kota Tegal'
+          }
+        ).addTo(leafletMap);
+
+        leafletLabelLayer = L.tileLayer(
+          'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+          {
+            maxZoom: 19,
+            pane: 'overlayPane'
+          }
+        ).addTo(leafletMap);
+      } else if (mapMode === 'esri') {
+        // Esri World Topo Map (Detail Topografi & Batas Administrasi Kota Tegal, Bebas API Key)
+        leafletTileLayer = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+          {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri — Peta Topografi Kota Tegal'
+          }
+        ).addTo(leafletMap);
+      } else {
+        // Default: Esri World Street Map Resmi (100% Bebas API Key & Bebas Blokir Iframe)
+        leafletTileLayer = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+          {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri — Peta Jalan & Wilayah Kota Tegal'
+          }
+        ).addTo(leafletMap);
+      }
+    }
+
+    function ubahModePeta(modeBaru) {
+      mapMode = modeBaru;
+      pasangTileLayerPeta();
+      const btnStreet = document.getElementById('btnMapStreet');
+      const btnEsri = document.getElementById('btnMapEsri');
+      const btnSat = document.getElementById('btnMapSat');
+      if (btnStreet) {
+        btnStreet.className = `whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${mapMode === 'street' ? 'bg-brand-dark text-white' : 'text-ink-500 hover:text-ink-900'}`;
+      }
+      if (btnEsri) {
+        btnEsri.className = `whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${mapMode === 'esri' ? 'bg-brand-dark text-white' : 'text-ink-500 hover:text-ink-900'}`;
+      }
+      if (btnSat) {
+        btnSat.className = `whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${mapMode === 'satellite' ? 'bg-brand-dark text-white' : 'text-ink-500 hover:text-ink-900'}`;
+      }
+    }
+
+    function fokusKecamatanPeta(namaKecamatan) {
+      activeMapKecamatan = namaKecamatan;
+      renderApp();
+    }
+
+    function arahkanKeRumahWarga(idWarga) {
+      selectedWargaId = Number(idWarga);
+      const daftarPrioritas = getDaftarPrioritas();
+      const target = daftarPrioritas.find(w => w.id === selectedWargaId);
+      const cardEl = document.getElementById('mapDetailCard');
+      if (cardEl && target) {
+        cardEl.innerHTML = renderIsiKartuDetailPeta(target);
+      }
+      if (leafletMap && target) {
+        leafletMap.flyTo([target.lat, target.lng], 16, { duration: 0.7 });
+      }
+    }
+
+    // 7. FUNGSI UTAMA RENDER SELURUH APLIKASI
+    function renderApp() {
+      const header = document.getElementById('appHeader');
+      const mobileNav = document.getElementById('mobileBottomNav');
+      const main = document.getElementById('appMain');
+
+      if (!isLoggedIn || activePage === 'login') {
+        header.classList.add('hidden');
+        mobileNav.classList.add('hidden');
+        main.innerHTML = renderLoginPage();
+        return;
+      }
+
+      header.classList.remove('hidden');
+      mobileNav.classList.remove('hidden');
+
+      // Update state aktif di tombol navigasi atas (Segmented Pill Satu Baris) & bawah
+      document.querySelectorAll('.top-nav-btn').forEach(btn => {
+        const navTarget = btn.getAttribute('data-top-nav');
+        const aktif = navTarget === activePage || (activePage === 'detail' && navTarget === 'verifikasi');
+        btn.className = `top-nav-btn whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+          aktif ? 'bg-white text-brand-blue shadow-xs' : 'text-ink-500 hover:text-ink-900'
+        }`;
+      });
+
+      document.querySelectorAll('.mob-nav-btn').forEach(btn => {
+        const navTarget = btn.getAttribute('data-mob-nav');
+        const aktif = navTarget === activePage || (activePage === 'detail' && navTarget === 'verifikasi');
+        btn.className = `mob-nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl transition-colors ${
+          aktif ? 'text-brand-blue font-bold' : 'text-ink-500'
+        }`;
+      });
+
+      if (activePage === 'home') {
+        main.innerHTML = renderHomePage();
+      } else if (activePage === 'verifikasi') {
+        main.innerHTML = renderVerifikasiPage();
+      } else if (activePage === 'detail') {
+        main.innerHTML = renderDetailCpbPage();
+      } else if (activePage === 'survey') {
+        main.innerHTML = renderSurveyPage();
+        setTimeout(initSurveyMiniMap, 80);
+      } else if (activePage === 'peta') {
+        main.innerHTML = renderPetaPage();
+        setTimeout(initRealKotaTegalMap, 80);
+      }
+    }
+
+    window.addEventListener('resize', function () {
+      if (leafletMap) leafletMap.invalidateSize();
+      if (surveyMiniMap) surveyMiniMap.invalidateSize();
+    });
+
+    // Jalankan aplikasi saat halaman selesai dimuat
+    window.onload = function () {
+      renderApp();
+    };
+  </script>
+</body>
+</html>
